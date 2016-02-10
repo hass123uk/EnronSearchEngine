@@ -3,9 +3,11 @@ package DAL;
 import BE.Document;
 import java.util.List;
 
-public interface IDocumentsRepository {
+public interface DocumentsRepository {
 
     public boolean createDocument(Document new_Document);
+
+    public boolean createDocuments(List<Document> documents_list);
 
     public List<Document> readAllDocuments();
 

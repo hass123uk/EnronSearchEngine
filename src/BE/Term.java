@@ -5,6 +5,10 @@ public class Term {
     private int term_ID;
     private String term_Value;
 
+    public Term(String Value) {
+        this.term_Value = Value;
+    }
+
     public Term(int ID, String Value) {
         this.term_ID = ID;
         this.term_Value = Value;

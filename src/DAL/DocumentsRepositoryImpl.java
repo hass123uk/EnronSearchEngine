@@ -7,24 +7,62 @@ package DAL;
 
 import BE.Document;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocumentsRepositoryImpl implements IDocumentsRepository {
+public class DocumentsRepositoryImpl implements DocumentsRepository {
 
-    private final DBConnectionManager connectionManager;
+    private final DatabaseConnection connectionManager;
 
     public DocumentsRepositoryImpl() {
-        connectionManager = DBConnectionManager.getInstance();
+        connectionManager = DatabaseConnection.getInstance();
     }
 
     @Override
     public boolean createDocument(Document new_Document) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try (Connection con = connectionManager.getConnection()) {
+            String sql = "INSERT INTO documents_tbl(documents_url, "
+                    + "documents_indexTime) VALUES(?, ?)";
 
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, new_Document.getDocument_URL());
+            ps.setDate(2, new java.sql.Date(
+                    new_Document.getDocument_IndexTime().getTime()));
+
+            ps.executeUpdate();
+
+            return true;
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public boolean createDocuments(List<Document> documents_list) {
+        try (Connection con = connectionManager.getConnection()) {
+            for (Document doc : documents_list) {
+                String sql = "INSERT INTO documents_tbl(documents_url, "
+                        + "documents_indexTime) VALUES(?, ?)";
+
+                PreparedStatement ps = con.prepareStatement(sql);
+                ps.setString(1, doc.getDocument_URL());
+                ps.setDate(2, new java.sql.Date(
+                        doc.getDocument_IndexTime().getTime()));
+
+                ps.executeUpdate();
+            }
+            return true;
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return false;
+        }
     }
 
     @Override

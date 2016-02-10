@@ -1,6 +1,7 @@
 package BE;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class Document {
@@ -10,10 +11,21 @@ public class Document {
     private Date document_IndexTime;
 
     private Map<Integer, Term> position_Term;
+    private List<String> terms;
+
+    public Document(String url) {
+        this.document_URL = url;
+    }
 
     public Document(int ID, String url) {
         this.document_ID = ID;
         this.document_URL = url;
+    }
+
+    public Document(String url, Date indexTime,
+            Map<Long, Term> position_Term) {
+        this.document_URL = url;
+        this.document_IndexTime = indexTime;
     }
 
     public Document(int ID, String url, Date indexTime,
@@ -55,6 +67,14 @@ public class Document {
 
     public void setPosition_Term(Map<Integer, Term> position_Term) {
         this.position_Term = position_Term;
+    }
+
+    public List<String> getTerms() {
+        return terms;
+    }
+
+    public void setTerms(List<String> terms) {
+        this.terms = terms;
     }
 
 }

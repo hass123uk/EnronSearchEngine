@@ -10,7 +10,7 @@ import java.sql.SQLException;
  * The properties are located in a configuration file under the configuration
  * directory;
  */
-public class DBConnectionManager {
+public class DatabaseConnection {
 
     //DB-Connection Properties
     private static final String DB_URL = "jdbc:mysql://localhost/documentterms";
@@ -20,7 +20,7 @@ public class DBConnectionManager {
     private static final String DBUSER_PASSWORD = "sqluserpw";
 
     private Connection connection;
-    private static DBConnectionManager instance = null;
+    private static DatabaseConnection instance = null;
 
     /**
      * Creates an instance of this class based on the properties from the
@@ -28,7 +28,7 @@ public class DBConnectionManager {
      *
      * @throws IOException if unable to read the configuration file.
      */
-    private DBConnectionManager() {
+    private DatabaseConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
 
@@ -45,14 +45,14 @@ public class DBConnectionManager {
     }
 
     /**
-     * Singleton pattern, gets the instance of the DBConnectionManager. The
-     * DBConnectionManager is then created only once.
+     * Singleton pattern, gets the instance of the DatabaseConnection. The
+ DatabaseConnection is then created only once.
      *
-     * @return the instance of the DBConnectionManager
+     * @return the instance of the DatabaseConnection
      */
-    public static synchronized DBConnectionManager getInstance() {
+    public static synchronized DatabaseConnection getInstance() {
         if (instance == null) {
-            instance = new DBConnectionManager();
+            instance = new DatabaseConnection();
         }
         return instance;
     }
