@@ -10,8 +10,9 @@ public class Document {
     private String document_URL;
     private Date document_IndexTime;
 
-    private Map<Integer, Term> position_Term;
+    private Map<Long, Term> position_Term;
     private List<String> terms;
+    private List<Term> document_Terms;
 
     public Document(String url) {
         this.document_URL = url;
@@ -29,12 +30,20 @@ public class Document {
     }
 
     public Document(int ID, String url, Date indexTime,
-            Map<Integer, Term> position_Term) {
+            Map<Long, Term> position_Term) {
 
         this.document_ID = ID;
         this.document_URL = url;
         this.document_IndexTime = indexTime;
         this.position_Term = position_Term;
+    }
+
+    public Document(String url, Date indexTime,
+            List<Term> document_Terms) {
+
+        this.document_URL = url;
+        this.document_IndexTime = indexTime;
+        this.document_Terms = document_Terms;
     }
 
     public int getDocument_ID() {
@@ -61,11 +70,11 @@ public class Document {
         this.document_IndexTime = document_IndexTime;
     }
 
-    public Map<Integer, Term> getPosition_Term() {
+    public Map<Long, Term> getPosition_Term() {
         return position_Term;
     }
 
-    public void setPosition_Term(Map<Integer, Term> position_Term) {
+    public void setPosition_Term(Map<Long, Term> position_Term) {
         this.position_Term = position_Term;
     }
 
@@ -75,6 +84,14 @@ public class Document {
 
     public void setTerms(List<String> terms) {
         this.terms = terms;
+    }
+
+    public List<Term> getDocument_Terms() {
+        return document_Terms;
+    }
+
+    public void setDocument_Terms(List<Term> document_Terms) {
+        this.document_Terms = document_Terms;
     }
 
 }
