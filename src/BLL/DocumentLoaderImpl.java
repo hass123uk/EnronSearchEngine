@@ -1,8 +1,7 @@
-package Crawlers;
+package BLL;
 
 import BE.Document;
 import BE.Term;
-import BLL.DocumentLoader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +67,7 @@ public class DocumentLoaderImpl implements DocumentLoader {
                 String[] lineSplitBySpace = line.split("\\s");
                 for (String term : lineSplitBySpace) {
                     Term nextTerm = new Term(term);
+
                     allTerms.add(nextTerm);
                 }
             });
@@ -79,7 +79,7 @@ public class DocumentLoaderImpl implements DocumentLoader {
         }
 
     }
-
+//
 //    private void loadAllDirPaths(Path start) throws IOException {
 //        try (DirectoryStream<Path> stream = Files.newDirectoryStream(start)) {
 //            for (Path entry : stream) {
