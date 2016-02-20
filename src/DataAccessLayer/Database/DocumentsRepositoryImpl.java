@@ -1,6 +1,6 @@
-package DAL;
+package DataAccessLayer.Database;
 
-import BE.Document;
+import BusinessEntities.Document;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

@@ -1,4 +1,4 @@
-package BE;
+package BusinessEntities;
 
 public class Term {
 

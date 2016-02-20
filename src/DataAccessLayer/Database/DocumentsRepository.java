@@ -1,6 +1,6 @@
-package DAL;
+package DataAccessLayer.Database;
 
-import BE.Document;
+import BusinessEntities.Document;
 import java.util.List;
 
 public interface DocumentsRepository {

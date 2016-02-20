@@ -1,4 +1,4 @@
-package DAL;
+package DataAccessLayer.Database;
 
 import java.io.IOException;
 import java.sql.Connection;

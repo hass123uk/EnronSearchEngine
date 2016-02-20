@@ -1,10 +1,11 @@
 package EnronSearchEngine;
 
-import BE.Document;
-import BE.Term;
-import BLL.DocumentLoader;
-import Crawlers.DocumentLoaderImpl;
-import java.io.IOException;
+import BusinessEntities.Document;
+import BusinessLogicLayer.DocumentsFactory;
+import BusinessLogicLayer.TermSplitter;
+import BusinessLogicLayer.TermSplitterImpl;
+import DataAccessLayer.FileSystem.FileLoader;
+import DataAccessLayer.FileSystem.FileLoaderImpl;
 import java.util.List;
 
 /**
@@ -16,27 +17,39 @@ public class EnronSearchEngine {
     private static final String FILE_NAME = "/EnronDataSet";
 
     private static final String ALL_DOCS = "/MailDir_FullSet";
+    private static final String HALF_ALL_DOCS = "/MailDir_HalfSet";
     private static final String FEW_DOCS = "/MailDir_SubSet";
 
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + FEW_DOCS;
+            + ALL_DOCS;
 
     public static void main(String[] args) {
-        DocumentLoader loader = new DocumentLoaderImpl();
+        FileLoader loader = new FileLoaderImpl();
+        TermSplitter splitter = new TermSplitterImpl("//s");
+        DocumentsFactory documentsFactory
+                = new DocumentsFactory(loader, splitter);
 
-        try {
-            List<Document> allDocuments
-                    = loader.loadAllDocumentsWithTerms(ENRON_DATASET_DIR);
+        loadFilesIntoDoc(documentsFactory);
+    }
 
-            System.out.println(allDocuments.size());
-            System.out.println(allDocuments.get(0).getDocument_URL());
-            allDocuments.get(0).getDocument_Terms().stream()
-                    .forEach((Term t) -> System.out.println(t.getTerm_Value()));
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
+    private static void loadFilesIntoDoc(DocumentsFactory documentsFactory) {
+        long startTime = System.nanoTime();
+        List<Document> allDocumentsWithinDir
+                = documentsFactory.loadFilesAndPopulateNewDocuments(
+                        ENRON_DATASET_DIR);
+        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
 
+        printResult("loadFilesAndPopulateDocuments()", executionTimeInSeconds, allDocumentsWithinDir.size());
+    }
+
+    private static void printResult(
+            String methodName, double executionTimeInSeconds, int filesSize) {
+        System.out.println(
+                methodName + "!  "
+                + "MethodExecitionTime: " + executionTimeInSeconds
+                + ", Files No: " + filesSize
+        );
     }
 }
