@@ -1,11 +1,14 @@
 package EnronSearchEngine;
 
 import BusinessEntities.Document;
-import BusinessLogicLayer.DocumentsFactory;
+import BusinessLogicLayer.DocumentLoader;
+import BusinessLogicLayer.DocumentLoaderImpl;
 import BusinessLogicLayer.TermSplitter;
 import BusinessLogicLayer.TermSplitterImpl;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -28,28 +31,25 @@ public class EnronSearchEngine {
     public static void main(String[] args) {
         FileLoader loader = new FileLoaderImpl();
         TermSplitter splitter = new TermSplitterImpl("//s");
-        DocumentsFactory documentsFactory
-                = new DocumentsFactory(loader, splitter);
+        DocumentLoader documentsFactory
+                = new DocumentLoaderImpl(loader, splitter);
+        Path basePath = Paths.get(ENRON_DATASET_DIR);
 
-        loadFilesIntoDoc(documentsFactory);
+        loadFilesIntoDoc(documentsFactory, basePath);
     }
 
-    private static void loadFilesIntoDoc(DocumentsFactory documentsFactory) {
+    private static void loadFilesIntoDoc(
+            DocumentLoader documentsFactory, Path basePath) {
         long startTime = System.nanoTime();
         List<Document> allDocumentsWithinDir
-                = documentsFactory.loadFilesAndPopulateNewDocuments(
-                        ENRON_DATASET_DIR);
+                = documentsFactory.loadDocuments(basePath);
         double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
 
-        printResult("loadFilesAndPopulateDocuments()", executionTimeInSeconds, allDocumentsWithinDir.size());
-    }
-
-    private static void printResult(
-            String methodName, double executionTimeInSeconds, int filesSize) {
         System.out.println(
-                methodName + "!  "
+                "loadFilesAndPopulateDocuments!  "
                 + "MethodExecitionTime: " + executionTimeInSeconds
-                + ", Files No: " + filesSize
+                + ", Files No: " + allDocumentsWithinDir.size()
         );
     }
+
 }
