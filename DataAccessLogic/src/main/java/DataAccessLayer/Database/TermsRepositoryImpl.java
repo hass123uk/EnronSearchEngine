@@ -1,33 +1,28 @@
 package DataAccessLayer.Database;
 
-import com.enron.search.domainmodels.Document;
+import com.enron.search.domainmodels.Term;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
+public class TermsRepositoryImpl implements ICRUD<Integer, Term> {
 
     private final DatabaseConnection connectionManager;
 
-    public DocumentsRepositoryImpl() {
+    public TermsRepositoryImpl() {
         connectionManager = DatabaseConnection.getInstance();
     }
 
     @Override
-    public boolean create(Document d) {
+    public boolean create(Term t) {
         try (Connection con = connectionManager.getConnection()) {
-            String sql = "INSERT INTO documents_tbl(documents_path, "
-                    + "documents_indexTime) VALUES(?, ?)";
-
-            PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, d.getDocument_Path());
-            ps.setDate(2, new java.sql.Date(
-                    d.getDocument_IndexTime().getTime()));
+            String sql = "INSERT INTO terms_tbl (terms_value) VALUES (?)";
+            PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, t.getTerm_Value());;
 
             ps.executeUpdate();
 
@@ -40,16 +35,13 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public boolean createAll(List<Document> d_list) {
+    public boolean createAll(List<Term> t_list) {
         try (Connection con = connectionManager.getConnection()) {
-            for (Document doc : d_list) {
-                String sql = "INSERT INTO documents_tbl(documents_path, "
-                        + "documents_indexTime) VALUES(?, ?)";
+            for (Term t : t_list) {
+                String sql = "INSERT INTO terms_tbl(terms_value) VALUES(?)";
 
                 PreparedStatement ps = con.prepareStatement(sql);
-                ps.setString(1, doc.getDocument_Path());
-                ps.setDate(2, new java.sql.Date(
-                        doc.getDocument_IndexTime().getTime()));
+                ps.setString(1, t.getTerm_Value());
 
                 ps.executeUpdate();
             }
@@ -62,16 +54,17 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public List<Document> readAll() {
+    public List<Term> readAll() {
         try (Connection con = connectionManager.getConnection()) {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(
-                    "SELECT * FROM documents_tbl");
-            ArrayList<Document> documents = new ArrayList<>();
+                    "SELECT * FROM terms_tbl");
+            ArrayList<Term> terms = new ArrayList<>();
             while (rs.next()) {
-                documents.add(resultSetToObject(rs));
+                terms.add(resultSetToObject(rs));
             }
-            return documents;
+            return terms;
+
         } catch (SQLException ex) {
             System.out.println(ex.getSQLState());
             return null;
@@ -79,9 +72,9 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public Document read(Integer id) {
+    public Term read(Integer id) {
         try (Connection con = connectionManager.getConnection()) {
-            String sql = "SELECT * FROM documents_tbl WHERE documents_id = ?";
+            String sql = "SELECT * FROM terms_tbl WHERE terms_id = ?";
 
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
@@ -91,7 +84,7 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
             if (rs.next()) {
                 return resultSetToObject(rs);
             } else {
-                System.err.println("Unable to retrieve document with ID = "
+                System.err.println("Unable to retrieve term with ID = "
                         + id);
                 return null;
             }
@@ -102,22 +95,18 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public boolean update(Document d) {
+    public boolean update(Term t) {
         try (Connection con = connectionManager.getConnection()) {
-            String sql = "UPDATE documents_tbl SET documents_path = ?, "
-                    + "documents_indexTime = ? WHERE Id = "
-                    + d.getDocument_ID();
+            String sql = "UPDATE terms_tbl SET terms_value = ? WHERE Id = "
+                    + t.getTerm_ID();
             PreparedStatement ps = con.prepareStatement(sql);
-            ps.setString(1, d.getDocument_Path());
-            ps.setDate(2,
-                    new java.sql.Date(d.getDocument_IndexTime()
-                            .getTime()));
+            ps.setString(1, t.getTerm_Value());
 
             int affectedRows = ps.executeUpdate();
 
             if (affectedRows == 0) {
-                System.err.println("Unable to update document with ID = "
-                        + d.getDocument_ID());
+                System.err.println("Unable to update term with ID = "
+                        + t.getTerm_ID());
                 return false;
             }
         } catch (SQLException ex) {
@@ -130,7 +119,7 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     @Override
     public boolean delete(Integer id) {
         try (Connection con = connectionManager.getConnection()) {
-            String sql = "DELETE documents_tbl WHERE documents_id = ?";
+            String sql = "DELETE terms_tbl WHERE terms_id = ?";
 
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, id);
@@ -138,7 +127,7 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
             int affectedRows = ps.executeUpdate();
 
             if (affectedRows == 0) {
-                System.err.println("Unable to delete document with ID = "
+                System.err.println("Unable to delete term with ID = "
                         + id);
                 return false;
             }
@@ -152,13 +141,12 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public Document resultSetToObject(ResultSet rs) {
+    public Term resultSetToObject(ResultSet rs) {
         try {
-            int ID = rs.getInt("documents_id");
-            String path = rs.getString("documents_path");
-            Date indexTime = new java.sql.Date(rs.getDate("documents_indexTime").getTime());
+            int ID = rs.getInt("terms_id");
+            String value = rs.getString("terms_value");
 
-            return new Document(ID, path, indexTime);
+            return new Term(ID, value);
 
         } catch (SQLException ex) {
             System.out.println(ex.getSQLState());
@@ -167,8 +155,8 @@ public class DocumentsRepositoryImpl implements ICRUD<Integer, Document> {
     }
 
     @Override
-    public ArrayList<Document> search(String search) {
-        throw new UnsupportedOperationException("Not supported yet.");
-        //To change body of generated methods, choose Tools | Templates.
+    public ArrayList<Term> search(String query) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
 }

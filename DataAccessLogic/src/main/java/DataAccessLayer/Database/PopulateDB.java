@@ -39,7 +39,7 @@ public class PopulateDB {
             PreparedStatement preparedStatement
                     = con.prepareStatement(sqlInsert);
 
-            preparedStatement.setString(1, doc.getDocument_URL());
+            preparedStatement.setString(1, doc.getDocument_Path());
             preparedStatement.setDate(2, new java.sql.Date(
                     doc.getDocument_IndexTime().getTime()));
 

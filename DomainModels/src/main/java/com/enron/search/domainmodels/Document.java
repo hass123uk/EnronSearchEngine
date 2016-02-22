@@ -6,27 +6,33 @@ import java.util.List;
 public class Document {
 
     private int document_ID;
-    private String document_URL;
+    private String document_Path;
     private Date document_IndexTime;
     private List<Term> document_Terms;
 
-    public Document(int ID, String url) {
+    public Document(int ID, String path) {
         this.document_ID = ID;
-        this.document_URL = url;
+        this.document_Path = path;
     }
 
-    public Document(String url, Date indexTime, List<Term> document_Terms) {
-        this.document_URL = url;
+    public Document(String path, Date indexTime, List<Term> document_Terms) {
+        this.document_Path = path;
         this.document_IndexTime = indexTime;
     }
 
-    public Document(int ID, String url, Date indexTime,
+    public Document(int ID, String path, Date indexTime,
             List<Term> document_Terms) {
 
         this.document_ID = ID;
-        this.document_URL = url;
+        this.document_Path = path;
         this.document_IndexTime = indexTime;
         this.document_Terms = document_Terms;
+    }
+
+    public Document(int ID, String path, Date indexTime) {
+        this.document_ID = ID;
+        this.document_Path = path;
+        this.document_IndexTime = indexTime;
     }
 
     public int getDocument_ID() {
@@ -37,12 +43,12 @@ public class Document {
         this.document_ID = document_ID;
     }
 
-    public String getDocument_URL() {
-        return document_URL;
+    public String getDocument_Path() {
+        return document_Path;
     }
 
-    public void setDocument_URL(String document_URL) {
-        this.document_URL = document_URL;
+    public void setDocument_Path(String document_Path) {
+        this.document_Path = document_Path;
     }
 
     public Date getDocument_IndexTime() {
