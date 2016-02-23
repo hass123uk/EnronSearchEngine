@@ -1,11 +1,9 @@
 package BusinessLogicLayer;
 
-import com.enron.search.domainmodels.Document;
 import DataAccessLayer.Database.PopulateDB;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
 import java.nio.file.Paths;
-import java.util.List;
 
 /**
  *
@@ -22,26 +20,53 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + FEW_DOCS;
+            + HALF_ALL_DOCS;
 
     private static FileLoader loader;
     private static TermSplitter splitter;
-    private static DocumentLoader documentsLoader;
+    private static DocumentLoaderImpl documentsLoader;
     private static PopulateDB populateDB;
 
     public static void main(String[] args) {
         createDependencies();
-        List<Document> documentsFromFileSystem
-                = documentsLoader.loadDocuments(Paths.get(ENRON_DATASET_DIR));
+        documentsLoader.saveDocuments(Paths.get(ENRON_DATASET_DIR));
 
-        populateDB.populateDBWithDocumentsAndTerms(documentsFromFileSystem);
+//        List<Document> documents = loadDocuments();
+//        saveDocuments(documents);
     }
 
     public static void createDependencies() {
         loader = new FileLoaderImpl();
-        splitter = new TermSplitterImpl("//s");
-        documentsLoader = new DocumentLoaderImpl(loader, splitter);
+        splitter = new TermSplitterImpl("\\s+");
         populateDB = new PopulateDB();
+
+        documentsLoader = new DocumentLoaderImpl(loader, splitter, populateDB);
     }
 
+//    public static List<Document> loadDocuments() {
+//        long startTime = System.nanoTime();
+//
+//
+//        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
+//
+//        printResult("Load from File System", executionTimeInSeconds,
+//                documentsFromFileSystem.size());
+//
+//        return documentsFromFileSystem;
+//    }
+//    public static void saveDocuments(List<Document> documents) {
+//        long startTime = System.nanoTime();
+//        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
+//
+//        printResult("Save to DB", executionTimeInSeconds, documents.size());
+//
+//    }
+    private static void printResult(
+            String methodName, double executionTimeInSeconds, int filesSize) {
+        System.out.println(
+                methodName + "!  "
+                + "MethodExecitionTime: " + executionTimeInSeconds
+                + ", Files No: " + filesSize
+        );
+    }
 }

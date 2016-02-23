@@ -5,16 +5,8 @@
  */
 package com.enron.SearchEngine;
 
-import BusinessLogicLayer.DocumentLoader;
-import BusinessLogicLayer.DocumentLoaderImpl;
-import BusinessLogicLayer.TermSplitter;
-import BusinessLogicLayer.TermSplitterImpl;
-import DataAccessLayer.FileSystem.FileLoader;
-import DataAccessLayer.FileSystem.FileLoaderImpl;
 import com.enron.search.domainmodels.Document;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -43,20 +35,19 @@ public class SearchController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        FileLoader loader = new FileLoaderImpl();
-        TermSplitter splitter = new TermSplitterImpl("//s");
-
-        setUpTreeTable(loadDocuments(loader, splitter));
+//        FileLoader loader = new FileLoaderImpl();
+//        TermSplitter splitter = new TermSplitterImpl("//s");
+//
+//        setUpTreeTable(loadDocuments(loader, splitter));
     }
 
-    private List<Document> loadDocuments(FileLoader loader, TermSplitter splitter) {
-        DocumentLoader documentsFactory
-                = new DocumentLoaderImpl(loader, splitter);
-        Path basePath = Paths.get(ENRON_DATASET_DIR);
-
-        return documentsFactory.loadDocuments(basePath);
-    }
-
+//    private List<Document> loadDocuments(FileLoader loader, TermSplitter splitter) {
+////        DocumentLoader documentsFactory
+////                = new DocumentLoaderImpl(loader, splitter);
+////        Path basePath = Paths.get(ENRON_DATASET_DIR);
+////
+////        return documentsFactory.loadDocuments(basePath);
+//    }
     private void setUpTreeTable(List<Document> documents) {
         TreeItem<Document> rootNode = createTreeItems(documents);
         TreeTableColumn<Document, String> docURLColumn

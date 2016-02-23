@@ -1,84 +1,80 @@
 package DataAccessLayer.Database;
 
 import com.enron.search.domainmodels.Document;
-import com.enron.search.domainmodels.Term;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PopulateDB {
 
-    private final DatabaseConnection connectionManager;
+    private final Connection connection;
 
     public PopulateDB() {
-        connectionManager = DatabaseConnection.getInstance();
+        connection = DatabaseConnection.getInstance().getConnection();
     }
 
-    public void populateDBWithDocumentsAndTerms(List<Document> documents) {
-        try (Connection con = connectionManager.getConnection()) {
-
-            saveDocuments(con, documents);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(PopulateDB.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }
-    }
-
-    private void saveDocuments(Connection con, List<Document> documents_list)
-            throws SQLException, ClassNotFoundException {
+    public int saveDocument(Document document) {
         String sqlInsert = "INSERT INTO documents_tbl(documents_url, "
                 + "documents_indexTime) VALUES(?, ?)";
 
-        String sqlSelect = "SELECT * FROM DocumentTerms.documents_tbl";
+        String sqlSelect = "SELECT LAST_INSERT_ID()";
+        try (PreparedStatement preparedStatement
+                = connection.prepareStatement(sqlInsert)) {
 
-        for (Document doc : documents_list) {
-            PreparedStatement preparedStatement
-                    = con.prepareStatement(sqlInsert);
-
-            preparedStatement.setString(1, doc.getDocument_URL());
+            preparedStatement.setString(1, document.getDocument_URL());
             preparedStatement.setDate(2, new java.sql.Date(
-                    doc.getDocument_IndexTime().getTime()));
+                    document.getDocument_IndexTime().getTime()));
 
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
 
-            int documentId = resultSet.getInt("documents_id");
+            if (resultSet.next()) {
+                return resultSet.getInt("LAST_INSERT_ID()");
+            }
+            return -1;
 
-            saveTerms(con, doc.getDocument_Terms(), documentId);
+        } catch (SQLException ex) {
+            Logger.getLogger(PopulateDB.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
         }
     }
 
-    private void saveTerms(Connection con, List<Term> document_Terms,
-            int documentId) throws SQLException {
-        String sqlInsert = "INSERT INTO terms_tbl(terms_value)"
-                + "VALUES(?)" + "\n"
-                + "SELECT * FROM DocumentTerms.documents_tbl";
+    public int saveTerm(String term, int documentId) {
+        String sqlInsert = "INSERT INTO terms_tbl(terms_value) VALUES(?)";
+        String sqlSelect = "SELECT LAST_INSERT_ID()";
+        try (PreparedStatement preparedStatement
+                = connection.prepareStatement(sqlInsert)) {
 
-        for (Term term : document_Terms) {
-            PreparedStatement preparedStatment = con.prepareStatement(sqlInsert);
-            preparedStatment.setString(1, term.getTerm_Value());
-            ResultSet resultSet = preparedStatment.executeQuery();
-            int termId = resultSet.getInt("terms_id");
+            preparedStatement.setString(1, term);
 
-            createContain(con, termId, documentId);
+            preparedStatement.executeUpdate();
+            ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
+            if (resultSet.next()) {
+                return resultSet.getInt("LAST_INSERT_ID()");
+            }
+            return -1;
+        } catch (SQLException ex) {
+            Logger.getLogger(PopulateDB.class.getName()).log(Level.SEVERE, null, ex);
+            return -1;
         }
     }
 
-    private void createContain(Connection con, int termId, int documentId)
-            throws SQLException {
+    public void saveIndexInContainTbl(int termId, int documentId) {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id)"
                 + "VALUES(?, ?)";
 
-        PreparedStatement preparedStatement
-                = con.prepareStatement(sqlInsert);
+        try (PreparedStatement preparedStatement
+                = connection.prepareStatement(sqlInsert)) {
 
-        preparedStatement.setInt(1, termId);
-        preparedStatement.setInt(2, documentId);
+            preparedStatement.setInt(1, termId);
+            preparedStatement.setInt(2, documentId);
 
-        preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(PopulateDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

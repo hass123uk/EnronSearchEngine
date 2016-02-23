@@ -15,9 +15,15 @@ public class Document {
         this.document_URL = url;
     }
 
+    public Document(String url, Date indexTime) {
+        this.document_URL = url;
+        this.document_IndexTime = indexTime;
+    }
+
     public Document(String url, Date indexTime, List<Term> document_Terms) {
         this.document_URL = url;
         this.document_IndexTime = indexTime;
+        this.document_Terms = document_Terms;
     }
 
     public Document(int ID, String url, Date indexTime,
