@@ -33,6 +33,7 @@ public class FileLoaderImpl implements FileLoader {
                     .collect(Collectors.toList());
 
             return allFiles;
+
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             return null;
