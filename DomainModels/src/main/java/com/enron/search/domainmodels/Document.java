@@ -15,9 +15,15 @@ public class Document {
         this.document_Path = path;
     }
 
+    public Document(String path, Date indexTime) {
+        this.document_Path = path;
+        this.document_IndexTime = indexTime;
+    }
+
     public Document(String path, Date indexTime, List<Term> document_Terms) {
         this.document_Path = path;
         this.document_IndexTime = indexTime;
+        this.document_Terms = document_Terms;
     }
 
     public Document(int ID, String path, Date indexTime,
