@@ -49,7 +49,6 @@ public class DocumentIndexerImpl implements DocumentIndexer {
                 processFile(file);
             });
         });
-
         try {
             while (executor.awaitTermination(1, TimeUnit.DAYS)) {
 
@@ -72,5 +71,6 @@ public class DocumentIndexerImpl implements DocumentIndexer {
                     int termId = termsRepository.saveTerm(term.getTerm_Value(), docId);
                     containsRepositroy.saveIndexInContainTbl(termId, docId);
                 });
+
     }
 }

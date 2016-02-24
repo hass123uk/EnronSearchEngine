@@ -27,7 +27,7 @@ public class DocumentsRepository {
         try (PreparedStatement preparedStatement
                 = connection.prepareStatement(sqlInsert)) {
 
-            preparedStatement.setString(1, document.getDocument_URL());
+            preparedStatement.setString(1, document.getDocument_Path());
             preparedStatement.setDate(2, new java.sql.Date(
                     document.getDocument_IndexTime().getTime()));
 
@@ -52,7 +52,7 @@ public class DocumentsRepository {
         try (PreparedStatement preparedStatement
                 = connection.prepareStatement(sql)) {
             for (Document doc : documents_list) {
-                preparedStatement.setString(1, doc.getDocument_URL());
+                preparedStatement.setString(1, doc.getDocument_Path());
                 preparedStatement.setDate(2, new java.sql.Date(
                         doc.getDocument_IndexTime().getTime()));
 
