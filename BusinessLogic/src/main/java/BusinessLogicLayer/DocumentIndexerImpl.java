@@ -10,6 +10,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DocumentIndexerImpl implements DocumentIndexer {
 
@@ -35,41 +40,37 @@ public class DocumentIndexerImpl implements DocumentIndexer {
 
     @Override
     public void saveDocuments(Path basePath) {
-        long startTime = System.nanoTime();
         List<File> files = fileLoader.loadFiles(basePath);
-        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
 
-        System.out.println(
-                "Load Files: NumberOfFiles: " + files.size() + ".\n"
-                + "ExecutionTime: " + executionTimeInSeconds);
+        ExecutorService executor = Executors.newWorkStealingPool();
 
         files.stream().forEach((File file) -> {
-            long startLoadLines = System.nanoTime();
-            List<String> lines = fileLoader.loadLines(file.toPath());
-            List<Term> terms = termSplitter.splitLines(lines);
-            double loadLinesExecutionTime = (System.nanoTime() - startLoadLines) / 1E9;
-
-            Document document = new Document(
-                    file.getAbsolutePath(),
-                    new Date(System.currentTimeMillis()));
-
-            long startSaveToDB = System.nanoTime();
-            int docId = documentsRepository.saveDocument(document);
-            terms.stream()
-                    .forEach((Term term) -> {
-                        int termId = termsRepository.saveTerm(term.getTerm_Value(), docId);
-                        containsRepositroy.saveIndexInContainTbl(termId, docId);
-                    });
-            double saveToDBExecutionTime = (System.nanoTime() - startSaveToDB) / 1E9;
-
-            System.out.println(
-                    "Document: " + document.getDocument_URL()
-                    + "\nLoad and Split Terms -"
-                    + " ExecutionTime: " + loadLinesExecutionTime
-                    + " NumberOfLines:" + terms.size()
-                    + "\nSaveDocument - ExectionTime:" + saveToDBExecutionTime
-                    + "\n"
-            );
+            executor.submit(() -> {
+                processFile(file);
+            });
         });
+
+        try {
+            while (executor.awaitTermination(1, TimeUnit.DAYS)) {
+
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DocumentIndexerImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void processFile(File file) {
+        List<String> lines = fileLoader.loadLines(file.toPath());
+        List<Term> terms = termSplitter.splitLines(lines);
+        Document document = new Document(
+                file.getAbsolutePath(),
+                new Date(System.currentTimeMillis()));
+
+        int docId = documentsRepository.saveDocument(document);
+        terms.stream()
+                .forEach((Term term) -> {
+                    int termId = termsRepository.saveTerm(term.getTerm_Value(), docId);
+                    containsRepositroy.saveIndexInContainTbl(termId, docId);
+                });
     }
 }

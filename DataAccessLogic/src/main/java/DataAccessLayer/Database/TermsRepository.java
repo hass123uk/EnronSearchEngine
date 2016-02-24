@@ -17,12 +17,13 @@ public class TermsRepository {
 
     public int saveTerm(String term, int documentId) {
         String sqlInsert = "INSERT INTO terms_tbl(terms_value) VALUES(?)";
+
         String sqlSelect = "SELECT LAST_INSERT_ID()";
+
         try (PreparedStatement preparedStatement
                 = connection.prepareStatement(sqlInsert)) {
 
             preparedStatement.setString(1, term);
-
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
             if (resultSet.next()) {

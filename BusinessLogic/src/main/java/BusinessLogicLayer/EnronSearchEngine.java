@@ -3,7 +3,6 @@ package BusinessLogicLayer;
 import DataAccessLayer.Database.ContainsRepository;
 import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
-import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
 import java.nio.file.Paths;
 
@@ -23,14 +22,21 @@ public class EnronSearchEngine {
             = HOME_DIR
             + FILE_NAME
             + HALF_ALL_DOCS;
+    private static FileLoaderImpl loader;
 
     public static void main(String[] args) {
         DocumentIndexer documentsLoader = createDocumentIndexer();
+//        FileLoaderBenchmarks benchmarks = new FileLoaderBenchmarks();
+////        benchmarks.loadUsingFind(ENRON_DATASET_DIR);
+//
+//        benchmarks.readLinesBenchmark(
+//                loader.loadFiles(Paths.get(ENRON_DATASET_DIR)));
         documentsLoader.saveDocuments(Paths.get(ENRON_DATASET_DIR));
+
     }
 
     public static DocumentIndexer createDocumentIndexer() {
-        FileLoader loader = new FileLoaderImpl();
+        loader = new FileLoaderImpl();
         TermSplitter splitter = new TermSplitterImpl("\\s+");
         DocumentsRepository documentsRepository = new DocumentsRepository();
         TermsRepository termsRepository = new TermsRepository();

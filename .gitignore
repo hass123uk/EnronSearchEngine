@@ -3,3 +3,6 @@
 /DomainModels/target/
 /EnronGUI/target/
 /DataAccessLogic/nbproject/
+
+*.iml
+/.idea

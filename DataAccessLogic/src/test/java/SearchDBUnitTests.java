@@ -24,6 +24,6 @@ public class SearchDBUnitTests {
 
         Collection<String> listOfDocPaths = term_DocPath.get("phillip.allen@enron.com");
 
-        Assert.assertEquals(2038, listOfDocPaths.size());
+        Assert.assertEquals(2039, listOfDocPaths.size());
     }
 }
