@@ -5,6 +5,8 @@
  */
 package DataAccessLayer.Database;
 
+import org.async.jdbc.AsyncConnection;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,25 +19,23 @@ import java.util.logging.Logger;
  */
 public class ContainsRepository {
 
-    private final Connection connection;
+    private final AsyncConnection connection;
 
     public ContainsRepository() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = new DatabaseConnection().getConnection();
     }
 
     public void saveIndexInContainTbl(int termId, int documentId) {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id)"
                 + "VALUES(?, ?)";
 
-        try (PreparedStatement preparedStatement
-                = connection.prepareStatement(sqlInsert)) {
-
-            preparedStatement.setInt(1, termId);
-            preparedStatement.setInt(2, documentId);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(SearchDB.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try (PreparedStatement preparedStatement
+//                = connection.prepareStatement(sqlInsert)) {
+//
+//            preparedStatement.setInt(1, termId);
+//            preparedStatement.setInt(2, documentId);
+//
+//            preparedStatement.executeUpdate();
+        
     }
 }

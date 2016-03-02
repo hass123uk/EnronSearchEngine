@@ -2,19 +2,16 @@ package DataAccessLayer.Database;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import org.async.jdbc.AsyncConnection;
+import org.async.jdbc.PreparedStatement;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SearchDB {
 
-    private final Connection connection;
+    private final AsyncConnection connection;
 
     public SearchDB() {
-        connection = DatabaseConnection.getInstance().getConnection();
+        connection = new DatabaseConnection().getConnection();
     }
 
     public Multimap<String, String> getSimilarTermsWithDocumentPath(String searchTerm) {
@@ -29,23 +26,21 @@ public class SearchDB {
                 + "\n"
                 + "where terms_value like ?;";
 
-        try (PreparedStatement preparedStatement
-                = connection.prepareStatement(sqlSelect)) {
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement(sqlSelect);
 
             preparedStatement.setString(1, "%" + searchTerm + "%");
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                String term = resultSet.getString("terms_value");
-                String doc_Path = resultSet.getString("documents_url");
-                termMultimap.put(term, doc_Path);
-            }
-            return termMultimap;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(SearchDB.class.getName())
-                    .log(Level.SEVERE, null, ex);
-            return null;
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            while (resultSet.next()) {
+//                String term = resultSet.getString("terms_value");
+//                String doc_Path = resultSet.getString("documents_url");
+//                termMultimap.put(term, doc_Path);
+//            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return termMultimap;
     }
 }
