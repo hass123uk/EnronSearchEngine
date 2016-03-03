@@ -23,16 +23,16 @@ public class ContainsRepository {
         connection = DatabaseConnection.getInstance().getConnection();
     }
 
-    public void saveIndexInContainTbl(int termId, int documentId) {
-        String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id)"
-                + "VALUES(?, ?)";
+    public void saveIndexInContainTbl(int termId, int documentId, int positionId) {
+        String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id, position_index)"
+                + "VALUES(?, ?, ?)";
 
         try (PreparedStatement preparedStatement
                 = connection.prepareStatement(sqlInsert)) {
 
             preparedStatement.setInt(1, termId);
             preparedStatement.setInt(2, documentId);
-
+            preparedStatement.setInt(3, positionId);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             Logger.getLogger(SearchDB.class.getName()).log(Level.SEVERE, null, ex);

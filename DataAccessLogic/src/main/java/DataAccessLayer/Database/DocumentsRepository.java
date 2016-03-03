@@ -19,7 +19,7 @@ public class DocumentsRepository {
         connection = DatabaseConnection.getInstance().getConnection();
     }
 
-    public int saveDocument(Document document) {
+    public int saveDocument(Document document) throws SQLException{
         String sqlInsert = "INSERT INTO documents_tbl(documents_url, "
                 + "documents_indexTime) VALUES(?, ?)";
 
@@ -37,10 +37,6 @@ public class DocumentsRepository {
             if (resultSet.next()) {
                 return resultSet.getInt("LAST_INSERT_ID()");
             }
-            return -1;
-
-        } catch (SQLException ex) {
-            Logger.getLogger(SearchDB.class.getName()).log(Level.SEVERE, null, ex);
             return -1;
         }
     }

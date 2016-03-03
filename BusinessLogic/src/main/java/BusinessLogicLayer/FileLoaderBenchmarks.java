@@ -3,6 +3,7 @@ package BusinessLogicLayer;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -30,6 +31,24 @@ public class FileLoaderBenchmarks {
         double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
 
         printResult("Files.Find()", executionTimeInSeconds, allFiles.size());
+    }
+
+    public void loadUsingFindWithoutMapping(String baseDirPath) {
+        List<Path> allFiles;
+        long startTime = System.nanoTime();
+        allFiles = fileLoader.loadPaths(Paths.get(baseDirPath));
+        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
+
+        printResult("Files.FindWithoutMap()", executionTimeInSeconds, allFiles.size());
+    }
+
+    public void loadUsingDirStream(String baseDirPath) {
+        List<Path> allFiles;
+        long startTime = System.nanoTime();
+        allFiles = fileLoader.loadUsingDirStream(Paths.get(baseDirPath));
+        double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
+
+        printResult("Files.FindWithoutMap()", executionTimeInSeconds, allFiles.size());
     }
 
     public void readLinesBenchmark(List<File> allFiles) {
