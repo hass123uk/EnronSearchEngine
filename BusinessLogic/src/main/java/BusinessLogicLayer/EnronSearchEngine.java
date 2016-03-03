@@ -33,22 +33,24 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + FEW_DOCS;
+            + HALF_ALL_DOCS;
 
     private static FileLoader loader;
     private static ExecutorService pool;
+    private static TermsRepository termsRepository;
+
     public static void main(String[] args) throws Exception {
         loader = new FileLoaderImpl();
+        termsRepository = new TermsRepository();
         TermSplitter splitter = new TermSplitterImpl("\\s+");
 
         int maxThreads = DEFAULT_MAX_THREADS;
+
         pool = Executors.newWorkStealingPool();
+
         Collection<Callable<String>> indexFileCallableList = new ArrayList<>();
 
         List<File> files = loader.loadFiles(Paths.get(ENRON_DATASET_DIR));
-        if (files.size() < maxThreads) {
-            maxThreads = files.size();
-        }
 
         for (File file : files) {
             IndexFileCallable indexFileCallable = createIndexFileRunnable(file.toPath(), loader, splitter);
@@ -59,7 +61,6 @@ public class EnronSearchEngine {
         List<String> threadResults = invokeAllCallablesAndWait(indexFileCallableList);
         threadResults.stream().forEach(System.out::println);
         shutdownAndAwaitTermination(pool);
-
     }
 
     private static List<String> invokeAllCallablesAndWait(Collection<Callable<String>> indexFileCallableList) {
@@ -81,7 +82,6 @@ public class EnronSearchEngine {
 
     public static IndexFileCallable createIndexFileRunnable(Path filePath, FileLoader loader, TermSplitter splitter) {
         DocumentsRepository documentsRepository = new DocumentsRepository();
-        TermsRepository termsRepository = new TermsRepository();
         ContainsRepository containsRepository = new ContainsRepository();
 
         return new IndexFileCallable(

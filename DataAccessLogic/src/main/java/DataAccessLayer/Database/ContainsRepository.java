@@ -17,18 +17,12 @@ import java.util.logging.Logger;
  */
 public class ContainsRepository {
 
-    private final Connection connection;
-
-    public ContainsRepository() {
-        connection = DatabaseConnection.getInstance().getConnection();
-    }
-
     public void saveIndexInContainTbl(int termId, int documentId, int positionId) {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id, position_index)"
                 + "VALUES(?, ?, ?)";
 
-        try (PreparedStatement preparedStatement
-                = connection.prepareStatement(sqlInsert)) {
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
 
             preparedStatement.setInt(1, termId);
             preparedStatement.setInt(2, documentId);

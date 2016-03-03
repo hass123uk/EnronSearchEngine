@@ -7,13 +7,11 @@ import DataAccessLayer.FileSystem.FileLoader;
 import com.enron.search.domainmodels.Document;
 import com.enron.search.domainmodels.Term;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class IndexFileCallable implements Callable {
@@ -48,10 +46,9 @@ public class IndexFileCallable implements Callable {
 
         Date indexTime = new Date();
         List<Term> terms = termSplitter.splitLines(lines);
-
         int documentId = saveDocument(filePath.toAbsolutePath().toString(), indexTime);
         if (documentId != -1) {
-            List<Integer> termIDs = saveTerms(documentId, terms);
+            List<Integer> termIDs = saveTerms(terms);
             saveRelation(documentId, termIDs);
             return "Success - Document inserted in the database! FilePath: " + filePath.toString() + ".\n"
                     + "TermIds Size: " + termIDs.size() + " - Terms Size: " + terms.size() + ".\n";
@@ -68,7 +65,7 @@ public class IndexFileCallable implements Callable {
         }
     }
 
-    private List<Integer> saveTerms(int documentId, List<Term> terms) {
+    private List<Integer> saveTerms(List<Term> terms) {
         for (Term term : terms) {
             //Check here for term duplicates.
             try {
