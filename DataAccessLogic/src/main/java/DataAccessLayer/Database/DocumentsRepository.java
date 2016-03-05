@@ -1,24 +1,22 @@
 package DataAccessLayer.Database;
 
 import com.enron.search.domainmodels.Document;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DocumentsRepository {
 
-    public int saveDocument(Document document) throws SQLException{
+    public int saveDocument(Document document) throws SQLException {
         String sqlInsert = "INSERT INTO documents_tbl(documents_url, "
                 + "documents_indexTime) VALUES(?, ?)";
-
         String sqlSelect = "SELECT LAST_INSERT_ID()";
-        try (   Connection connection = Database.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
 
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)
+        ) {
             preparedStatement.setString(1, document.getDocument_Path());
             preparedStatement.setDate(2, new java.sql.Date(
                     document.getDocument_IndexTime().getTime()));

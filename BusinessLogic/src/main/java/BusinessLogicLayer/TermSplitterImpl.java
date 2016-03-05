@@ -2,6 +2,7 @@ package BusinessLogicLayer;
 
 import com.enron.search.domainmodels.Term;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

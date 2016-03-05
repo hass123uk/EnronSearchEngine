@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface ICRUD<Key, Value> {
+public interface CRUD<Key, Value> {
 
     public boolean create(Value v);
 

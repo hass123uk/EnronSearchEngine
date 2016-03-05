@@ -1,8 +1,6 @@
 package DataAccessLayer.Database;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -19,7 +17,7 @@ public final class Database {
 
     static {
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost/documentterms");
+        dataSource.setUrl("jdbc:mysql://localhost/documentterms?autoReconnect=true&useSSL=false");
         dataSource.setUsername("sqluser");
         dataSource.setPassword("sqluserpw");
     }
@@ -31,6 +29,4 @@ public final class Database {
     private Database() {
         //
     }
-
-
 }
