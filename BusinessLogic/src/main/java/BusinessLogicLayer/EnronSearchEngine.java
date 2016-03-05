@@ -11,7 +11,7 @@ import java.nio.file.Paths;
  */
 public class EnronSearchEngine {
 
-    private static final String HOME_DIR = "/Users/HassanMahmud";
+    private static final String HOME_DIR = "~";
     private static final String FILE_NAME = "/EnronDataSet";
 
     private static final String ALL_DOCS = "/MailDir_FullSet";
@@ -21,13 +21,13 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + HALF_ALL_DOCS;
+            + FEW_DOCS;
     private static FileLoaderImpl loader;
 
     public static void main(String[] args) {
         DocumentIndexer documentsLoader = createDocumentIndexer();
 //        FileLoaderBenchmarks benchmarks = new FileLoaderBenchmarks();
-////        benchmarks.loadUsingFind(ENRON_DATASET_DIR);
+//        benchmarks.loadUsingFind(ENRON_DATASET_DIR);
 //
 //        benchmarks.readLinesBenchmark(
 //                loader.loadFiles(Paths.get(ENRON_DATASET_DIR)));
