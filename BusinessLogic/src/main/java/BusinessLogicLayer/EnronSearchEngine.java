@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  */
 public class EnronSearchEngine {
 
-    private static final String HOME_DIR = "/Users/HassanMahmud";
+    private static final String HOME_DIR = "~";
     private static final String FILE_NAME = "/EnronDataSet";
 
     private static final String ALL_DOCS = "/MailDir_FullSet";
@@ -33,7 +33,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + HALF_ALL_DOCS;
+            + FEW_DOCS;
 
     private static FileLoader loader;
     private static ExecutorService pool;
@@ -50,7 +50,7 @@ public class EnronSearchEngine {
 
         Collection<Callable<String>> indexFileCallableList = new ArrayList<>();
 
-        List<File> files = loader.loadFiles(Paths.get(ENRON_DATASET_DIR));
+        List<File> files = loader.loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~",System.getProperty("user.home"))));
 
         for (File file : files) {
             IndexFileCallable indexFileCallable = createIndexFileRunnable(file.toPath(), loader, splitter);
