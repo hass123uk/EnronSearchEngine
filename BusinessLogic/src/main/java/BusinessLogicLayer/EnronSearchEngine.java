@@ -40,6 +40,8 @@ public class EnronSearchEngine {
     private static TermsRepository termsRepository;
 
     public static void main(String[] args) throws Exception {
+        final long startTime = System.currentTimeMillis();
+
         loader = new FileLoaderImpl();
         termsRepository = new TermsRepository();
         TermSplitter splitter = new TermSplitterImpl("\\s+");
@@ -59,7 +61,9 @@ public class EnronSearchEngine {
         files.clear();
 
         List<String> threadResults = invokeAllCallablesAndWait(indexFileCallableList);
-        threadResults.stream().forEach(System.out::println);
+        final long endTime = System.currentTimeMillis();
+        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)+ "for "+indexFileCallableList.size()+" files.");
+//        threadResults.stream().forEach(System.out::println);
         shutdownAndAwaitTermination(pool);
     }
 
