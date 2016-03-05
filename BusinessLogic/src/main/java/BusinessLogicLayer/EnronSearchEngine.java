@@ -62,7 +62,7 @@ public class EnronSearchEngine {
 
         List<String> threadResults = invokeAllCallablesAndWait(indexFileCallableList);
         final long endTime = System.currentTimeMillis();
-        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)+ "for "+indexFileCallableList.size()+" files.");
+        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)+ " seconds for "+indexFileCallableList.size()+" files.");
 //        threadResults.stream().forEach(System.out::println);
         shutdownAndAwaitTermination(pool);
     }
