@@ -11,7 +11,7 @@ import java.nio.file.Paths;
  */
 public class EnronSearchEngine {
 
-    private static final String HOME_DIR = "~";
+    private static final String HOME_DIR = "/Users/anthonymonori";
     private static final String FILE_NAME = "/EnronDataSet";
 
     private static final String ALL_DOCS = "/MailDir_FullSet";
