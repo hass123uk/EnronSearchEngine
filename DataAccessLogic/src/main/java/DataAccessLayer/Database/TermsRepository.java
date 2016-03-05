@@ -2,10 +2,11 @@ package DataAccessLayer.Database;
 
 import org.async.jdbc.AsyncConnection;
 import org.async.jdbc.PreparedStatement;
-import org.async.jdbc.ResultSetCallback;
-import org.async.jdbc.Statement;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TermsRepository {
 
@@ -20,36 +21,18 @@ public class TermsRepository {
 
         String sqlSelect = "SELECT LAST_INSERT_ID()";
 
-        final int[] lastID = new int[1];
-
+        PreparedStatement preparedStatement = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert);
-
-            preparedStatement.executeUpdate(psmt -> {
-                psmt.setString(1, term);
-            }, DatabaseConnection.returnSuccessCallback());
-
-            Statement st = connection.createStatement();
-
-            st.executeCall(sqlSelect,
-                    new ResultSetCallback() {
-                        @Override
-                        public void onError(SQLException e) {
-
-                        }
-
-                        @Override
-                        public void onResultSet(org.async.jdbc.ResultSet resultSet) {
-                            while (resultSet.hasNext()) {
-                                lastID[0] = resultSet.getInteger("LAST_INSERT_ID()");
-                            }
-                        }
-            }, DatabaseConnection.returnSuccessCallback());
-
+            preparedStatement = connection.prepareStatement(sqlInsert);
+//            preparedStatement.setString(1, term);
+//            preparedStatement.executeUpdate();
+//            ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
+//            if (resultSet.next()) {
+//                return resultSet.getInt("LAST_INSERT_ID()");
+//            }
         } catch (SQLException e) {
             e.printStackTrace();
-            lastID[0] = -1;
         }
-        return lastID[0];
+        return -1;
     }
 }

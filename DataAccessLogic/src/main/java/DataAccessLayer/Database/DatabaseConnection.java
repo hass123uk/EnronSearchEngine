@@ -1,6 +1,7 @@
 package DataAccessLayer.Database;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.SQLException;
 
 import org.async.jdbc.*;
@@ -34,8 +35,8 @@ public class DatabaseConnection {
 
     }
 
-    public static SuccessCallback returnSuccessCallback() {
-        return new SuccessCallback() {
+    public AsyncConnection getConnection() {
+        SuccessCallback successCallback = new SuccessCallback() {
 
             @Override
             public void onSuccess(OK ok) {
@@ -45,23 +46,22 @@ public class DatabaseConnection {
             @Override
             public void onError(SQLException e) {
                 e.printStackTrace();
+
             }
 
         };
-    }
-
-    public AsyncConnection getConnection() {
         Multiplexer mpx = null;
         try {
             mpx = new Multiplexer();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        AsyncConnection connection = null;
         try {
-            return (AsyncConnection) (connection = new MysqlConnection(DB_URL, 3306, DBUSER_USERNAME, DBUSER_PASSWORD, DB_NAME, mpx.getSelector(), returnSuccessCallback()));
+            connection = new MysqlConnection(DB_URL, 3306, DBUSER_USERNAME, DBUSER_PASSWORD, DB_NAME, mpx.getSelector(), successCallback);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
         }
+        return connection;
     }
 }

@@ -1,12 +1,9 @@
 package BusinessLogicLayer;
 
 import DataAccessLayer.Database.ContainsRepository;
-import DataAccessLayer.Database.DatabaseConnection;
 import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
-import org.async.jdbc.AsyncConnection;
-
 import java.nio.file.Paths;
 
 /**

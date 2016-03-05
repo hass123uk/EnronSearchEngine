@@ -6,10 +6,11 @@
 package DataAccessLayer.Database;
 
 import org.async.jdbc.AsyncConnection;
-import org.async.jdbc.PreparedQuery;
-import org.async.jdbc.PreparedStatement;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -28,17 +29,13 @@ public class ContainsRepository {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id)"
                 + "VALUES(?, ?)";
 
-        PreparedStatement preparedStatement = null;
-        try {
-            preparedStatement = connection.prepareStatement(sqlInsert);
-
-            preparedStatement.executeUpdate(pstmt -> {
-                pstmt.setInteger(1, termId);
-                pstmt.setInteger(2, documentId);
-            },DatabaseConnection.returnSuccessCallback());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+//        try (PreparedStatement preparedStatement
+//                = connection.prepareStatement(sqlInsert)) {
+//
+//            preparedStatement.setInt(1, termId);
+//            preparedStatement.setInt(2, documentId);
+//
+//            preparedStatement.executeUpdate();
 
     }
 }

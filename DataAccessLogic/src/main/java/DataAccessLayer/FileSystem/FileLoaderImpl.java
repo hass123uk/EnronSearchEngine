@@ -66,4 +66,8 @@ public class FileLoaderImpl implements FileLoader {
             return null;
         }
     }
+
+    public List<File> loadFiles(String ENRON_DATASET_DIR) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

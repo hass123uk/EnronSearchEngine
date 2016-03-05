@@ -42,8 +42,19 @@ public class DocumentIndexerImpl implements DocumentIndexer {
     public void saveDocuments(Path basePath) {
         List<File> files = fileLoader.loadFiles(basePath);
 
-        for (File file:files) {
-            processFile(file);
+        ExecutorService executor = Executors.newWorkStealingPool();
+
+        files.stream().forEach((File file) -> {
+            executor.submit(() -> {
+                processFile(file);
+            });
+        });
+        try {
+            while (executor.awaitTermination(1, TimeUnit.DAYS)) {
+
+            }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DocumentIndexerImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
