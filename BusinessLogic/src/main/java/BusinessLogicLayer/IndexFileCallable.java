@@ -61,6 +61,7 @@ public class IndexFileCallable implements Callable {
         try {
             return documentsRepository.saveDocument(document);
         } catch (SQLException e) {
+            e.printStackTrace();
             return -1;
         }
     }
@@ -72,6 +73,7 @@ public class IndexFileCallable implements Callable {
                 int termId = termsRepository.saveTerm(term.getTerm_Value());
                 term.setTerm_ID(termId);
             } catch (SQLException e) {
+                e.printStackTrace();
                 return null;
             }
         }

@@ -29,6 +29,7 @@ public class ContainsRepository {
             preparedStatement.setInt(3, positionId);
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
+            ex.printStackTrace();
             Logger.getLogger(SearchDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
