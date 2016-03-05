@@ -4,7 +4,13 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.async.jdbc.AsyncConnection;
 import org.async.jdbc.PreparedStatement;
+import org.async.jdbc.ResultSet;
+import org.async.jdbc.ResultSetCallback;
+
+import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 public class SearchDB {
 
@@ -30,14 +36,25 @@ public class SearchDB {
         try {
             preparedStatement = connection.prepareStatement(sqlSelect);
 
-            preparedStatement.setString(1, "%" + searchTerm + "%");
-//            ResultSet resultSet = preparedStatement.executeQuery();
-//
-//            while (resultSet.next()) {
-//                String term = resultSet.getString("terms_value");
-//                String doc_Path = resultSet.getString("documents_url");
-//                termMultimap.put(term, doc_Path);
-//            }
+            preparedStatement.executeQuery(psmt -> {
+                psmt.setString(1, "%" + searchTerm + "%");
+            }, new ResultSetCallback() {
+                @Override
+                public void onResultSet(ResultSet resultSet) {
+                    while (resultSet.hasNext()) {
+                        resultSet.next();
+                        String term = resultSet.getString("terms_value");
+                        String doc_Path = resultSet.getString("documents_url");
+                        termMultimap.put(term, doc_Path);
+                    }
+                }
+
+                @Override
+                public void onError(SQLException e) {
+                    e.printStackTrace();
+                }
+            });
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

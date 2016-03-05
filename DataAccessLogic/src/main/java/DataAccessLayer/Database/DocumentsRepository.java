@@ -1,17 +1,9 @@
 package DataAccessLayer.Database;
 
 import com.enron.search.domainmodels.Document;
-import org.async.jdbc.AsyncConnection;
+import org.async.jdbc.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DocumentsRepository {
 
@@ -26,68 +18,37 @@ public class DocumentsRepository {
                 + "documents_indexTime) VALUES(?, ?)";
 
         String sqlSelect = "SELECT LAST_INSERT_ID()";
-//        try (PreparedStatement preparedStatement
-//                = connection.prepareStatement(sqlInsert)) {
-//
-//            preparedStatement.setString(1, document.getDocument_Path());
-//            preparedStatement.setDate(2, new java.sql.Date(
-//                    document.getDocument_IndexTime().getTime()));
-//
-//            preparedStatement.executeUpdate();
-//            ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
-//
-//            if (resultSet.next()) {
-//                return resultSet.getInt("LAST_INSERT_ID()");
-//            }
-//            return -1;
 
-        return -1;
-    }
+        final int[] lastID = new int[1];
 
-    public boolean saveDocuments(List<Document> documents_list) {
-        String sql = "INSERT INTO documents_tbl(documents_url, "
-                + "documents_indexTime) VALUES(?, ?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert);
 
-//        try (PreparedStatement preparedStatement
-//                = connection.prepareStatement(sql)) {
-//            for (Document doc : documents_list) {
-//                preparedStatement.setString(1, doc.getDocument_Path());
-//                preparedStatement.setDate(2, new java.sql.Date(
-//                        doc.getDocument_IndexTime().getTime()));
-//
-//                preparedStatement.executeUpdate();
-//            }
-//            return true;
-//
-//        } catch (SQLException ex) {
-//            System.out.println(ex.getMessage());
-//            return false;
-//        }
-        return false;
-    }
+            preparedStatement.executeUpdate(psmt -> {
+                psmt.setString(1, document.getDocument_Path());
+                psmt.setDate(2, new java.sql.Date(document.getDocument_IndexTime().getTime()));
+            }, DatabaseConnection.returnSuccessCallback());
 
-    public List<Document> readAllDocuments() {
-//        try (Statement st = connection.createStatement();) {
-//
-//            ResultSet rs = st.executeQuery(
-//                    "SELECT * FROM DocumentTerms.documents_tbl");
-//            ArrayList<Document> documents = new ArrayList<>();
-//            while (rs.next()) {
-//                documents.add(resultSetToObject(rs));
-//            }
-//            return documents;
-//        } catch (SQLException ex) {
-//            System.out.println(ex.getSQLState());
-//            return null;
-//        }
-        return null;
-    }
+            Statement st = connection.createStatement();
 
-    private Document resultSetToObject(ResultSet rs) throws SQLException {
-        int ID = rs.getInt("documents_id");
-        String URL = rs.getString("documents_url");
+            st.executeCall(sqlSelect,
+                    new ResultSetCallback() {
+                        @Override
+                        public void onError(SQLException e) {
+                            lastID[0] = -1;
+                        }
 
-        return new Document(ID, URL);
+                        @Override
+                        public void onResultSet(org.async.jdbc.ResultSet resultSet) {
+                            while (resultSet.hasNext()) {
+                                lastID[0] = resultSet.getInteger("LAST_INSERT_ID()");
+                            }
+                        }
+                    }, DatabaseConnection.returnSuccessCallback());
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastID[0];
     }
 }
