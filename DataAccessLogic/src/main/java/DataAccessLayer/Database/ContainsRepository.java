@@ -42,7 +42,7 @@ public class ContainsRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
             connection.setAutoCommit(false);
 
-            int positionId = 0;
+            int positionId = 1;
             int i = 0;
 
             for (Integer termId : termIds) {
@@ -51,8 +51,8 @@ public class ContainsRepository {
                 preparedStatement.setInt(3, positionId);
                 preparedStatement.addBatch();
                 positionId++;
-
-                if ((i + 1) % 1000 == 0 || (i + 1) == termIds.size()) {
+                i++;
+                if (i % 1000 == 0 || i == termIds.size()) {
                     preparedStatement.executeBatch();
                 }
             }
