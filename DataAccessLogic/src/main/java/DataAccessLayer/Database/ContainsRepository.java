@@ -8,12 +8,12 @@ package DataAccessLayer.Database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
  * @author HassanMahmud
  */
 public class ContainsRepository {
@@ -40,15 +40,24 @@ public class ContainsRepository {
 
         try (Connection connection = Database.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
+            connection.setAutoCommit(false);
+
             int positionId = 0;
-            for(Integer termId : termIds) {
+            int i = 0;
+
+            for (Integer termId : termIds) {
                 preparedStatement.setInt(1, termId);
                 preparedStatement.setInt(2, documentId);
                 preparedStatement.setInt(3, positionId);
                 preparedStatement.addBatch();
                 positionId++;
+
+                if ((i + 1) % 1000 == 0 || (i + 1) == termIds.size()) {
+                    preparedStatement.executeBatch();
+                }
             }
-            preparedStatement.executeBatch();
+
+            connection.commit();
         } catch (SQLException ex) {
             ex.printStackTrace();
         }

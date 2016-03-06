@@ -2,10 +2,7 @@ package DataAccessLayer.Database;
 
 import com.enron.search.domainmodels.Term;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,16 +11,15 @@ public class TermsRepository {
     public int saveTerm(String term) throws SQLException {
         String sqlInsert = "INSERT INTO terms_tbl(terms_value) VALUES(?)";
 
-        String sqlSelect = "SELECT LAST_INSERT_ID()";
         try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)
         ) {
 
             preparedStatement.setString(1, term);
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.executeQuery(sqlSelect);
+            ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if (resultSet.next()) {
-                return resultSet.getInt("LAST_INSERT_ID()");
+                return resultSet.getInt(1);
             }
             return -1;
         }

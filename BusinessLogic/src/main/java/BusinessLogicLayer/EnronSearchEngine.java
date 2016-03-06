@@ -29,7 +29,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + FEW_DOCS;
+            + ALL_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -53,7 +53,7 @@ public class EnronSearchEngine {
         List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
         List<String> threadResults = invokeAll(callables);
 
-        threadResults.stream().forEach(System.out::println);
+//        threadResults.stream().forEach(System.out::println);
 
         final long endTime = System.currentTimeMillis();
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
