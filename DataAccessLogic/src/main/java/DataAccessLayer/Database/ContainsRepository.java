@@ -8,6 +8,7 @@ package DataAccessLayer.Database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +31,26 @@ public class ContainsRepository {
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
-            Logger.getLogger(SearchDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void bulkSaveIndexInContainTbl(List<Integer> termIds, int documentId) {
+        String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id, position_index)"
+                + "VALUES(?, ?, ?)";
+
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
+            int positionId = 0;
+            for(Integer termId : termIds) {
+                preparedStatement.setInt(1, termId);
+                preparedStatement.setInt(2, documentId);
+                preparedStatement.setInt(3, positionId);
+                preparedStatement.addBatch();
+                positionId++;
+            }
+            preparedStatement.executeBatch();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
     }
 }

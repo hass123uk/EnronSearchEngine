@@ -6,12 +6,8 @@ import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -28,48 +24,68 @@ public class EnronSearchEngine {
     private static final String HALF_ALL_DOCS = "/MailDir_HalfSet";
     private static final String FEW_DOCS = "/MailDir_SubSet";
 
-    private static final int DEFAULT_MAX_THREADS = 8;
+    private static final int DEFAULT_MAX_THREADS = 10;
 
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
             + FEW_DOCS;
 
-    private static FileLoader loader;
+    private static FileLoader fileLoader;
+    private static TermSplitter splitter;
     private static ExecutorService pool;
+
     private static TermsRepository termsRepository;
+    private static DocumentsRepository documentsRepository;
+    private static ContainsRepository containsRepository;
+    private static TermsBiMapLock termsBiMapLock;
 
     public static void main(String[] args) throws Exception {
-        final long startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
+        fileLoader = new FileLoaderImpl();
 
-        loader = new FileLoaderImpl();
-        termsRepository = new TermsRepository();
-        TermSplitter splitter = new TermSplitterImpl("\\s+");
+        splitter = new TermSplitterImpl("\\W+");
+        createRepositories();
 
-        int maxThreads = DEFAULT_MAX_THREADS;
+        pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
+        termsBiMapLock = new TermsBiMapLock(termsRepository.readAll());
+        int sizeBeforeIndexing = termsBiMapLock.termsBiMap.size();
+        List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
+        List<String> threadResults = invokeAll(callables);
 
-        pool = Executors.newWorkStealingPool();
+        threadResults.stream().forEach(System.out::println);
 
-        Collection<Callable<String>> indexFileCallableList = new ArrayList<>();
-
-        List<File> files = loader.loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~",System.getProperty("user.home"))));
-
-        for (File file : files) {
-            IndexFileCallable indexFileCallable = createIndexFileRunnable(file.toPath(), loader, splitter);
-            indexFileCallableList.add(indexFileCallable);
-        }
-        files.clear();
-
-        List<String> threadResults = invokeAllCallablesAndWait(indexFileCallableList);
         final long endTime = System.currentTimeMillis();
-        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)+ " seconds for "+indexFileCallableList.size()+" files.");
-//        threadResults.stream().forEach(System.out::println);
+        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
+                + " seconds for " + callables.size() + " files.\n"
+                + "Number of Terms Added to the DB: " + (termsBiMapLock.termsBiMap.size() - sizeBeforeIndexing) + ".\n");
         shutdownAndAwaitTermination(pool);
     }
 
-    private static List<String> invokeAllCallablesAndWait(Collection<Callable<String>> indexFileCallableList) {
+    private static void createRepositories() {
+        termsRepository = new TermsRepository();
+        documentsRepository = new DocumentsRepository();
+        containsRepository = new ContainsRepository();
+    }
+
+    private static List<Callable<String>> loadFilesFromFSAndMapToCallables() {
+        return fileLoader
+                .loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~", System.getProperty("user.home"))))
+                .stream()
+                .map(file -> (Callable<String>) newIndexFileTaskCallable(file.toPath()))
+                .collect(Collectors.toList());
+    }
+
+    private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
+        return new IndexTaskCallable(filePath,
+                termsBiMapLock, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
+        );
+    }
+
+    private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
         try {
-            return pool.invokeAll(indexFileCallableList).stream()
+            return pool.invokeAll(indexFileCallableList)
+                    .stream()
                     .map(future -> {
                         try {
                             return future.get();
@@ -82,16 +98,6 @@ public class EnronSearchEngine {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static IndexFileCallable createIndexFileRunnable(Path filePath, FileLoader loader, TermSplitter splitter) {
-        DocumentsRepository documentsRepository = new DocumentsRepository();
-        ContainsRepository containsRepository = new ContainsRepository();
-
-        return new IndexFileCallable(
-                filePath, loader, splitter,
-                documentsRepository, termsRepository, containsRepository
-        );
     }
 
     private static void shutdownAndAwaitTermination(ExecutorService pool) {

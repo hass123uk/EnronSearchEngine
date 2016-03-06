@@ -17,6 +17,7 @@ public class TermSplitterImpl implements TermSplitter {
     public List<Term> splitLines(List<String> lines) {
         return lines.stream()
                 .flatMap(line -> Stream.of(line.split(regexToSplitOn)))
+                .map(String::toLowerCase)
                 .map(Term::new)
                 .collect(Collectors.toList());
     }

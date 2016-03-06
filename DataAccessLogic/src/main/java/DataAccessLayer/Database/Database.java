@@ -1,8 +1,6 @@
 package DataAccessLayer.Database;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -31,6 +29,4 @@ public final class Database {
     private Database() {
         //
     }
-
-
 }
