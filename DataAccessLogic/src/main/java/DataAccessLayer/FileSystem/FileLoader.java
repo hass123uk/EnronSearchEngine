@@ -16,6 +16,10 @@ public interface FileLoader {
 
     public List<File> loadFiles(Path basePath);
 
+    public List<Path> loadPaths(Path basePath);
+
+    public List<Path> loadUsingDirStream(Path basePath);
+
     public List<File> loadFilesWithFindFileVisitor(Path basePath);
 
     public List<String> loadLines(Path filePath);

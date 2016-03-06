@@ -2,6 +2,8 @@ package DataAccessLayer.Database;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.mysql.fabric.xmlrpc.base.Data;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,12 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SearchDB {
-
-    private final Connection connection;
-
-    public SearchDB() {
-        connection = DatabaseConnection.getInstance().getConnection();
-    }
 
     public Multimap<String, String> getSimilarTermsWithDocumentPath(String searchTerm) {
         Multimap<String, String> termMultimap = ArrayListMultimap.create();
@@ -29,7 +25,8 @@ public class SearchDB {
                 + "\n"
                 + "where terms_value like ?;";
 
-        try (PreparedStatement preparedStatement
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement
                 = connection.prepareStatement(sqlSelect)) {
 
             preparedStatement.setString(1, "%" + searchTerm + "%");
