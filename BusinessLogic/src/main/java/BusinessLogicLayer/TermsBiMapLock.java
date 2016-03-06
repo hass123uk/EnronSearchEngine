@@ -20,7 +20,7 @@ public class TermsBiMapLock {
     public TermsBiMapLock(List<Term> terms) {
         termsBiMap = Maps.synchronizedBiMap(HashBiMap.create(
                 terms.stream()
-                        .collect(Collectors.toMap(term -> term.getTerm_ID(), term -> term.getTerm_Value()))));
+                        .collect(Collectors.toMap(Term::getTerm_ID, Term::getTerm_Value))));
     }
 
 

@@ -25,7 +25,6 @@ public class IndexTaskCallable implements Callable {
     private final DocumentsRepository documentsRepository;
     private final TermsRepository termsRepository;
     private final ContainsRepository containsRepository;
-    private int foundDuplicate = 0;
 
     public IndexTaskCallable(
             Path filePath,
@@ -75,12 +74,11 @@ public class IndexTaskCallable implements Callable {
     }
 
     private List<Integer> saveTerms(List<Term> terms) {
-
-        try {
-            for (Term term : terms) {
+        for (Term term : terms) {
+            termsBiMapLock.lock.lock();
+            try {
                 boolean containsValue = termsBiMapLock.termsBiMap.containsValue(term.getTerm_Value());
                 if (containsValue) {
-                    termsBiMapLock.lock.lock();
                     BiMap<String, Integer> inverse = termsBiMapLock.termsBiMap.inverse();
                     Integer termId = inverse.get(term.getTerm_Value());
                     term.setTerm_ID(termId);
@@ -88,7 +86,6 @@ public class IndexTaskCallable implements Callable {
                     try {
                         int termId = termsRepository.saveTerm(term.getTerm_Value());
                         if (termId != ERROR_CODE) {
-                            termsBiMapLock.lock.lock();
                             termsBiMapLock.termsBiMap.put(termId, term.getTerm_Value());
                             term.setTerm_ID(termId);
                         }
@@ -96,9 +93,9 @@ public class IndexTaskCallable implements Callable {
                         e.printStackTrace();
                     }
                 }
+            } finally {
+                termsBiMapLock.lock.unlock();
             }
-        } finally {
-            termsBiMapLock.lock.unlock();
         }
         return terms.stream().map(Term::getTerm_ID).collect(Collectors.toList());
     }

@@ -53,9 +53,7 @@ public class FileLoaderBenchmarks {
 
     public void readLinesBenchmark(List<File> allFiles) {
         long startTime = System.nanoTime();
-        allFiles.stream().forEach((File file) -> {
-            fileLoader.loadLines(file.toPath());
-        });
+        allFiles.stream().forEach(file -> fileLoader.loadLines(file.toPath()));
         double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
 
         printResult("BufferedReader.lines()", executionTimeInSeconds, allFiles.size());

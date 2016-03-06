@@ -5,7 +5,6 @@ import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
-import com.enron.search.domainmodels.Term;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,7 +76,7 @@ public class EnronSearchEngine {
                 .collect(Collectors.toList());
     }
 
-    public static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
+    private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath,
                 termsBiMapLock, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
         );
