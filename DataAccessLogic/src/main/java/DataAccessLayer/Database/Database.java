@@ -17,7 +17,7 @@ public final class Database {
 
     static {
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost/documentterms?autoReconnect=true&useSSL=false");
+        dataSource.setUrl("jdbc:mysql://localhost/temDocs?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
         dataSource.setUsername("sqluser");
         dataSource.setPassword("sqluserpw");
     }

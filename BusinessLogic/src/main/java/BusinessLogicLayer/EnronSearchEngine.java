@@ -38,7 +38,7 @@ public class EnronSearchEngine {
     private static TermsRepository termsRepository;
     private static DocumentsRepository documentsRepository;
     private static ContainsRepository containsRepository;
-    private static TermsBiMapLock termsBiMapLock;
+    private static SynchronizedTermsMap synchronizedTermsMap;
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -46,17 +46,15 @@ public class EnronSearchEngine {
 
         splitter = new TermSplitterImpl("\\W+");
         createRepositories();
-        
+
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        termsBiMapLock = new TermsBiMapLock(termsRepository.readAll());
-        int sizeBeforeIndexing = termsBiMapLock.termsBiMap.size();
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
         List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
         invokeAll(callables);
 
         final long endTime = System.currentTimeMillis();
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
-                + " seconds for " + callables.size() + " files.\n"
-                + "Number of Terms Added to the DB: " + (termsBiMapLock.termsBiMap.size() - sizeBeforeIndexing) + ".\n");
+                + " seconds for " + callables.size() + " files.\n");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -76,7 +74,7 @@ public class EnronSearchEngine {
 
     private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath,
-                termsBiMapLock, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
+                synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
         );
     }
 

@@ -6,7 +6,6 @@ import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import com.enron.search.domainmodels.Document;
 import com.enron.search.domainmodels.Term;
-import com.google.common.collect.BiMap;
 
 import java.nio.file.Path;
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ public class IndexTaskCallable implements Callable {
 
     private static final int ERROR_CODE = -1;
 
-    private final TermsBiMapLock termsBiMapLock;
+    private final SynchronizedTermsMap syncTermsMap;
     private final Path filePath;
     private final FileLoader fileLoader;
     private final TermSplitter termSplitter;
@@ -29,7 +28,7 @@ public class IndexTaskCallable implements Callable {
 
     public IndexTaskCallable(
             Path filePath,
-            TermsBiMapLock termsBiMapLock,
+            SynchronizedTermsMap synchronizedTermsMap,
             FileLoader fileLoader,
             TermSplitter termSplitter,
             DocumentsRepository documentsRepository,
@@ -37,7 +36,7 @@ public class IndexTaskCallable implements Callable {
             ContainsRepository containsRepository) {
 
         this.filePath = filePath;
-        this.termsBiMapLock = termsBiMapLock;
+        this.syncTermsMap = synchronizedTermsMap;
         this.fileLoader = fileLoader;
         this.termSplitter = termSplitter;
         this.documentsRepository = documentsRepository;
@@ -77,33 +76,23 @@ public class IndexTaskCallable implements Callable {
 
     public List<Integer> saveTerms(List<Term> terms) {
         for (Term term : terms) {
-            termsBiMapLock.lock.lock();
-            try {
-                boolean containsValue = termsBiMapLock.termsBiMap.containsValue(term.getTerm_Value());
-                if (containsValue) {
-                    BiMap<String, Integer> inverse = termsBiMapLock.termsBiMap.inverse();
-                    Integer termId = inverse.get(term.getTerm_Value());
+            int mapTermId = syncTermsMap.putTermInMap(term);
+            if (mapTermId != syncTermsMap.TEMP_TERM_ID) {
+                term.setTerm_ID(mapTermId);
+            } else try {
+                int termId = termsRepository.saveTerm(term.getTerm_Value());
+                if (termId != ERROR_CODE) {
                     term.setTerm_ID(termId);
-                } else {
-                    try {
-                        int termId = termsRepository.saveTerm(term.getTerm_Value());
-                        if (termId != ERROR_CODE) {
-                            termsBiMapLock.termsBiMap.put(termId, term.getTerm_Value());
-                            term.setTerm_ID(termId);
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    syncTermsMap.updateTermID(term);
                 }
-            } finally {
-                termsBiMapLock.lock.unlock();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
         return terms.stream().map(Term::getTerm_ID).collect(Collectors.toList());
     }
 
-    public void saveRelation(int documentId, List<Integer> termIDs) {
-        List<Integer> termIds = termIDs.stream().collect(Collectors.toList());
-        containsRepository.bulkSaveIndexInContainTbl(termIds, documentId);
+    private void saveRelation(int documentId, List<Integer> termIDs) {
+        containsRepository.bulkSaveIndexInContainTbl(termIDs, documentId);
     }
 }
