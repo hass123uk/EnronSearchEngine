@@ -4,13 +4,13 @@
 import org.junit.Before;
 import org.junit.Test;
 
-public class IndexFileCallable {
+public class IndexFileCallable_Tests {
 
-    private IndexFileCallable callable;
+    private IndexFileCallable_Tests callable;
 
     @Before
     public void setup(){
-        callable = new IndexFileCallable();
+        callable = new IndexFileCallable_Tests();
     }
 
     @Test

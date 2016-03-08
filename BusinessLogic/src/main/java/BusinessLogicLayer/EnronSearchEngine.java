@@ -46,14 +46,12 @@ public class EnronSearchEngine {
 
         splitter = new TermSplitterImpl("\\W+");
         createRepositories();
-
+        
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
         termsBiMapLock = new TermsBiMapLock(termsRepository.readAll());
         int sizeBeforeIndexing = termsBiMapLock.termsBiMap.size();
         List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
-        List<String> threadResults = invokeAll(callables);
-
-//        threadResults.stream().forEach(System.out::println);
+        invokeAll(callables);
 
         final long endTime = System.currentTimeMillis();
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)

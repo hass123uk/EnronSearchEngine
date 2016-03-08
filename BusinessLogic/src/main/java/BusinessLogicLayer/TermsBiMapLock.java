@@ -22,6 +22,4 @@ public class TermsBiMapLock {
                 terms.stream()
                         .collect(Collectors.toMap(Term::getTerm_ID, Term::getTerm_Value))));
     }
-
-
 }
