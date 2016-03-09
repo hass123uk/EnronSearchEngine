@@ -76,17 +76,22 @@ public class IndexTaskCallable implements Callable {
 
     public List<Integer> saveTerms(List<Term> terms) {
         for (Term term : terms) {
-            int mapTermId = syncTermsMap.putTermInMap(term);
-            if (mapTermId != syncTermsMap.TEMP_TERM_ID) {
-                term.setTerm_ID(mapTermId);
-            } else try {
-                int termId = termsRepository.saveTerm(term.getTerm_Value());
-                if (termId != ERROR_CODE) {
-                    term.setTerm_ID(termId);
-                    syncTermsMap.updateTermID(term);
+            syncTermsMap.lock.lock();
+            try {
+                int mapTermId = syncTermsMap.getTermID(term.getTerm_Value());
+                if (mapTermId != syncTermsMap.TERM_NOT_IN_MAP_ERROR) {
+                    term.setTerm_ID(mapTermId);
+                } else try {
+                    int termId = termsRepository.saveTerm(term.getTerm_Value());
+                    if (termId != ERROR_CODE) {
+                        term.setTerm_ID(termId);
+                        syncTermsMap.putTerm(term);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } finally {
+                syncTermsMap.lock.unlock();
             }
         }
         return terms.stream().map(Term::getTerm_ID).collect(Collectors.toList());

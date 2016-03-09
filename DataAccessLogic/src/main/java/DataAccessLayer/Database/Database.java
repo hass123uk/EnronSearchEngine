@@ -26,7 +26,5 @@ public final class Database {
         return dataSource.getConnection();
     }
 
-    private Database() {
-        //
-    }
+    private Database() {}
 }

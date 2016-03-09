@@ -29,7 +29,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + ALL_DOCS;
+            + HALF_ALL_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
