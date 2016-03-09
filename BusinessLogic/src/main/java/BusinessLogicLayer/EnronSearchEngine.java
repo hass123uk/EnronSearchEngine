@@ -1,14 +1,20 @@
 package BusinessLogicLayer;
 
 import DataAccessLayer.Database.ContainsRepository;
+import DataAccessLayer.Database.Database;
 import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
+import DataAccessLayer.FileSystem.FileUtil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -29,7 +35,8 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + HALF_ALL_DOCS;
+            + FEW_DOCS;
+    private static final String PATH_TO_SQL_SCRIPT = System.getProperty("user.dir") + "/DocumentTermsStructureDump.sql";
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -45,6 +52,10 @@ public class EnronSearchEngine {
         fileLoader = new FileLoaderImpl();
 
         splitter = new TermSplitterImpl("\\W+");
+        if (!checkTables()) {
+            initDatabase();
+        }
+
         createRepositories();
 
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
@@ -56,6 +67,51 @@ public class EnronSearchEngine {
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
                 + " seconds for " + callables.size() + " files.\n");
         shutdownAndAwaitTermination(pool);
+    }
+
+    private static boolean checkTables() {
+        String sqlCheck = "SHOW TABLES";
+        try (Connection connection = Database.getConnection()) {
+            PreparedStatement ps = connection.prepareStatement(sqlCheck);
+            ResultSet res = ps.executeQuery();
+            res.last();
+            if (res.getRow() != 3) {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean initDatabase() {
+        Statement st = null;
+        try (Connection connection = Database.getConnection())
+        {
+            Scanner s = new Scanner(FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT));
+            s.useDelimiter("(;(\r)?\n)|(--\n)");
+            st = connection.createStatement();
+            while (s.hasNext())
+            {
+                String line = s.next();
+                if (line.startsWith("/*!") && line.endsWith("*/"))
+                {
+                    int i = line.indexOf(' ');
+                    line = line.substring(i + 1, line.length() - " */".length());
+                }
+
+                if (line.trim().length() > 0)
+                {
+                    st.execute(line);
+                }
+            }
+            st.close();
+        } catch (SQLException | FileNotFoundException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private static void createRepositories() {
