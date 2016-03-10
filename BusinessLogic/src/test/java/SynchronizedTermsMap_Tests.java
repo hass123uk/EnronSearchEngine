@@ -1,16 +1,15 @@
+import BusinessLogicLayer.IncrementalIDGenerator;
 import BusinessLogicLayer.SynchronizedTermsMap;
-import BusinessLogicLayer.UUIDGenerator;
 import com.enron.search.domainmodels.Term;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.*;
 
 /**
  * Created by HassanMahmud on 09/03/2016.
@@ -19,6 +18,7 @@ public class SynchronizedTermsMap_Tests {
     private static final int STARTING_NUM_OF_TERMS = 800;
     private List<Term> startingTerms;
     private SynchronizedTermsMap synchronizedTermsMap;
+    private IncrementalIDGenerator mockIncrementalIDGenerator;
 
     @Before
     public void setup() {
@@ -26,8 +26,8 @@ public class SynchronizedTermsMap_Tests {
         for (int i = 0; i < STARTING_NUM_OF_TERMS; i++) {
             startingTerms.add(new Term("" + i, "test" + i));
         }
-
-        synchronizedTermsMap = new SynchronizedTermsMap(startingTerms);
+        mockIncrementalIDGenerator = mock(IncrementalIDGenerator.class);
+        synchronizedTermsMap = new SynchronizedTermsMap(startingTerms, mockIncrementalIDGenerator);
     }
 
     @Test
@@ -39,22 +39,25 @@ public class SynchronizedTermsMap_Tests {
     @Test
     public void checkDuplicateTerms_ProvideWithNewTerm_AssertIdEqualToGeneratedID() {
         //Arrange
-        String generatedID = "GenereatedID";
+        String generatedId = "IDGenerated";
         String term_value = "I AM A NEW Term";
+        when(mockIncrementalIDGenerator.termIdGenerator()).thenReturn(generatedId);
         //Act
-        String term_Id = synchronizedTermsMap.checkDuplicateTerms(term_value, generatedID);
+        String term_Id = synchronizedTermsMap.getIdOrGenerateNewId(term_value);
         //Assert
-        assertEquals(term_Id, generatedID);
+        assertEquals(term_Id, generatedId);
     }
 
     @Test
     public void checkDuplicateTerms_ProvideWithTermAlreadyInMap_AssertIdNotEqualToGeneratedID() {
         //Arrange
-        String generatedID = "GenereatedID";
+        String generatedId = "IDGenerated";
+        when(mockIncrementalIDGenerator.termIdGenerator()).thenReturn(generatedId);
+
         String term_value = startingTerms.get(0).getTerm_Value();
         //Act
-        String term_Id = synchronizedTermsMap.checkDuplicateTerms(term_value, generatedID);
+        String term_Id = synchronizedTermsMap.getIdOrGenerateNewId(term_value);
         //Assert
-        assertNotEquals(term_Id, generatedID);
+        assertNotEquals(term_Id, generatedId);
     }
 }

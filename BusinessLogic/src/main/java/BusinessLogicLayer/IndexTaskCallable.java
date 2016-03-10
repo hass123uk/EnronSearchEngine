@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 
 public class IndexTaskCallable implements Callable {
 
-    private static final int ERROR_CODE = -1;
-
+    private IncrementalIDGenerator incrementalIDGenerator;
     private final SynchronizedTermsMap syncTermsMap;
     private final Path filePath;
     private final FileLoader fileLoader;
@@ -27,7 +26,7 @@ public class IndexTaskCallable implements Callable {
 
     public IndexTaskCallable(
             Path filePath,
-            SynchronizedTermsMap synchronizedTermsMap,
+            IncrementalIDGenerator incrementalIDGenerator, SynchronizedTermsMap synchronizedTermsMap,
             FileLoader fileLoader,
             TermSplitter termSplitter,
             DocumentsRepository documentsRepository,
@@ -35,6 +34,7 @@ public class IndexTaskCallable implements Callable {
             ContainsRepository containsRepository) {
 
         this.filePath = filePath;
+        this.incrementalIDGenerator = incrementalIDGenerator;
         this.syncTermsMap = synchronizedTermsMap;
         this.fileLoader = fileLoader;
         this.termSplitter = termSplitter;
@@ -47,7 +47,7 @@ public class IndexTaskCallable implements Callable {
     public Object call() throws Exception {
         List<String> lines = fileLoader.loadLines(filePath);
         Date indexTime = new Date();
-        String documentId = UUIDGenerator.generateID();
+        String documentId = incrementalIDGenerator.documentPKGenerator();
         saveDocument(documentId, filePath.toAbsolutePath().toString(), indexTime);
 
         List<Term> terms = termSplitter.splitLines(lines);
@@ -65,10 +65,9 @@ public class IndexTaskCallable implements Callable {
 
     public List<String> saveTerms(List<Term> terms) {
         for (Term term : terms) {
-            String generatedTermId = UUIDGenerator.generateID();
-            String termId = syncTermsMap.checkDuplicateTerms(term.getTerm_Value(), generatedTermId);
-            term.setTerm_ID(termId);
-            termsRepository.saveTerm(term);
+                String termId = syncTermsMap.getIdOrGenerateNewId(term.getTerm_Value());
+                term.setTerm_ID(termId);
+                termsRepository.saveTerm(term);
         }
         return terms.stream()
                 .map(Term::getTerm_ID)

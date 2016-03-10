@@ -2,11 +2,12 @@
  * Created by HassanMahmud on 04/03/2016.
  */
 
+import BusinessLogicLayer.IncrementalIDGenerator;
 import BusinessLogicLayer.IndexTaskCallable;
-import BusinessLogicLayer.TermSplitter;
 import BusinessLogicLayer.SynchronizedTermsMap;
-import DataAccessLayer.Database.DocumentsRepository;
+import BusinessLogicLayer.TermSplitter;
 import DataAccessLayer.Database.ContainsRepository;
+import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import com.enron.search.domainmodels.Term;
@@ -33,10 +34,11 @@ public class IndexFileCallable_Tests {
     private DocumentsRepository mockDocumentsRepo;
     private ContainsRepository mockContainsRepo;
     private TermsRepository mockTermsRepo;
+    private IncrementalIDGenerator mockIncrementalIDGenerator;
 
     private void createMocks() {
         mockSynchronizedTermsMap = mock(SynchronizedTermsMap.class);
-
+        mockIncrementalIDGenerator = new IncrementalIDGenerator();
         mockFileLoader = mock(FileLoader.class);
         mockTermSplitter = mock(TermSplitter.class);
 
@@ -47,21 +49,21 @@ public class IndexFileCallable_Tests {
 
     @Before
     public void setup() {
-        Path filePath = Paths.get("/Users/HassanMahmud/test");
-
+        createMocks();
         termList = new ArrayList<>();
         for (int i = 0; i < NUM_OF_TERMS; i++) {
-            termList.add(new Term("test" + i));
+            termList.add(new Term("id" + i, "term" + i));
         }
-
-        indexTaskCallable = new IndexTaskCallable(
-                filePath, mockSynchronizedTermsMap, mockFileLoader, mockTermSplitter,
-                mockDocumentsRepo, mockTermsRepo, mockContainsRepo
-        );
     }
 
     @Test
     public void saveTerms_TestAgainstManyTerms_AssertNoDuplicateTermIDs() {
+        Path filePath = Paths.get("/Users/HassanMahmud/test");
+        SynchronizedTermsMap realMap = new SynchronizedTermsMap(termList, mockIncrementalIDGenerator);
+        indexTaskCallable = new IndexTaskCallable(
+                filePath, mockIncrementalIDGenerator, realMap, mockFileLoader, mockTermSplitter,
+                mockDocumentsRepo, mockTermsRepo, mockContainsRepo);
+
 
         List<String> termsIDs = indexTaskCallable.saveTerms(termList);
         assertNotNull(termsIDs);

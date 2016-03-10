@@ -39,14 +39,16 @@ public class EnronSearchEngine {
     private static DocumentsRepository documentsRepository;
     private static ContainsRepository containsRepository;
     private static SynchronizedTermsMap synchronizedTermsMap;
+    private static IncrementalIDGenerator incrementalIDGenerator;
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
         splitter = new TermSplitterImpl("\\W+");
+        incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll(), incrementalIDGenerator);
 
         List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
         invokeAll(callableList);
@@ -72,7 +74,7 @@ public class EnronSearchEngine {
     }
 
     private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
-        return new IndexTaskCallable(filePath,
+        return new IndexTaskCallable(filePath, incrementalIDGenerator,
                 synchronizedTermsMap,fileLoader, splitter, documentsRepository, termsRepository, containsRepository);
     }
 
