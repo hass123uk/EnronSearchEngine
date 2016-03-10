@@ -6,24 +6,21 @@ import java.sql.*;
 
 public class DocumentsRepository {
 
-    public int saveDocument(Document document) throws SQLException {
-        String sqlInsert = "INSERT INTO documents_tbl(documents_url, "
-                + "documents_indexTime) VALUES(?, ?)";
+    public void saveDocument(Document document){
+        String sqlInsert = "INSERT INTO documents_tbl(documents_id, documents_url, "
+                + "documents_indexTime) VALUES(?, ?, ?)";
 
         try (Connection connection = Database.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS)
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)
         ) {
-            preparedStatement.setString(1, document.getDocument_Path());
-            preparedStatement.setDate(2, new java.sql.Date(
+            preparedStatement.setString(1, document.getDocument_ID());
+            preparedStatement.setString(2, document.getDocument_Path());
+            preparedStatement.setDate(3, new java.sql.Date(
                     document.getDocument_IndexTime().getTime()));
 
             preparedStatement.executeUpdate();
-            ResultSet resultSet = preparedStatement.getGeneratedKeys();
-
-            if (resultSet.next()) {
-                return resultSet.getInt(1);
-            }
-            return -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 //
@@ -63,12 +60,12 @@ public class DocumentsRepository {
 //            return null;
 //        }
 //    }
-
-    private Document resultSetToObject(ResultSet rs) throws SQLException {
-        int ID = rs.getInt("documents_id");
-        String URL = rs.getString("documents_url");
-
-        return new Document(ID, URL);
-
-    }
+//
+//    private Document resultSetToObject(ResultSet rs) throws SQLException {
+//        int ID = rs.getInt("documents_id");
+//        String URL = rs.getString("documents_url");
+//
+//        return new Document(ID, URL);
+//
+//    }
 }

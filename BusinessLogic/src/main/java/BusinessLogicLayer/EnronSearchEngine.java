@@ -29,7 +29,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + HALF_ALL_DOCS;
+            + FEW_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -43,18 +43,17 @@ public class EnronSearchEngine {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
-
         splitter = new TermSplitterImpl("\\W+");
         createRepositories();
-
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
         synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
-        List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
-        invokeAll(callables);
+
+        List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
+        invokeAll(callableList);
 
         final long endTime = System.currentTimeMillis();
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
-                + " seconds for " + callables.size() + " files.\n");
+                + " seconds for " + callableList.size() + " files.\n");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -74,8 +73,7 @@ public class EnronSearchEngine {
 
     private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath,
-                synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
-        );
+                synchronizedTermsMap,fileLoader, splitter, documentsRepository, termsRepository, containsRepository);
     }
 
     private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {

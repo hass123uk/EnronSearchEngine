@@ -8,7 +8,6 @@ import com.enron.search.domainmodels.Document;
 import com.enron.search.domainmodels.Term;
 
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -46,58 +45,37 @@ public class IndexTaskCallable implements Callable {
 
     @Override
     public Object call() throws Exception {
-        long startTime = System.nanoTime();
         List<String> lines = fileLoader.loadLines(filePath);
         Date indexTime = new Date();
+        String documentId = UUIDGenerator.generateID();
+        saveDocument(documentId, filePath.toAbsolutePath().toString(), indexTime);
+
         List<Term> terms = termSplitter.splitLines(lines);
+        List<String> termIDs = saveTerms(terms);
 
-        int documentId = saveDocument(filePath.toAbsolutePath().toString(), indexTime);
-        if (documentId != ERROR_CODE) {
-            List<Integer> termIDs = saveTerms(terms);
-            saveRelation(documentId, termIDs);
-            double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
-            return String.format("Success - Document inserted in the database! FilePath: %s.\n" +
-                            "TermIds Size: %d - Terms Size: %d.\n" +
-                            "Indexing time:%s Seconds  (Loading & Splitting lines/Saving Documents,Terms and Relations)\n"
-                    , filePath.toString(), termIDs.size(), terms.size(), executionTimeInSeconds);
-        }
-        return String.format("Error - Document was not inserted in the database! File Path: %s.\n", filePath.toString());
+        saveRelation(documentId, termIDs);
+
+        return null;
     }
 
-    private int saveDocument(String absoluteFilePath, Date indexTime) {
-        Document document = new Document(absoluteFilePath, indexTime);
-        try {
-            return documentsRepository.saveDocument(document);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ERROR_CODE;
-        }
+    private void saveDocument(String documentId, String absoluteFilePath, Date indexTime) {
+        Document document = new Document(documentId, absoluteFilePath, indexTime);
+        documentsRepository.saveDocument(document);
     }
 
-    public List<Integer> saveTerms(List<Term> terms) {
+    public List<String> saveTerms(List<Term> terms) {
         for (Term term : terms) {
-            syncTermsMap.lock.lock();
-            try {
-                int mapTermId = syncTermsMap.getTermID(term.getTerm_Value());
-                if (mapTermId != syncTermsMap.TERM_NOT_IN_MAP_ERROR) {
-                    term.setTerm_ID(mapTermId);
-                } else try {
-                    int termId = termsRepository.saveTerm(term.getTerm_Value());
-                    if (termId != ERROR_CODE) {
-                        term.setTerm_ID(termId);
-                        syncTermsMap.putTerm(term);
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } finally {
-                syncTermsMap.lock.unlock();
-            }
+            String generatedTermId = UUIDGenerator.generateID();
+            String termId = syncTermsMap.checkDuplicateTerms(term.getTerm_Value(), generatedTermId);
+            term.setTerm_ID(termId);
+            termsRepository.saveTerm(term);
         }
-        return terms.stream().map(Term::getTerm_ID).collect(Collectors.toList());
+        return terms.stream()
+                .map(Term::getTerm_ID)
+                .collect(Collectors.toList());
     }
 
-    private void saveRelation(int documentId, List<Integer> termIDs) {
+    private void saveRelation(String documentId, List<String> termIDs) {
         containsRepository.bulkSaveIndexInContainTbl(termIDs, documentId);
     }
 }
