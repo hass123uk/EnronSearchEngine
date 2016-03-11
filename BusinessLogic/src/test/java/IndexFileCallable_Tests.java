@@ -59,7 +59,7 @@ public class IndexFileCallable_Tests {
     @Test
     public void saveTerms_TestAgainstManyTerms_AssertNoDuplicateTermIDs() {
         Path filePath = Paths.get("/Users/HassanMahmud/test");
-        SynchronizedTermsMap realMap = new SynchronizedTermsMap(termList, mockIncrementalIDGenerator);
+        SynchronizedTermsMap realMap = new SynchronizedTermsMap(termList);
         indexTaskCallable = new IndexTaskCallable(
                 filePath, mockIncrementalIDGenerator, realMap, mockFileLoader, mockTermSplitter,
                 mockDocumentsRepo, mockTermsRepo, mockContainsRepo);

@@ -48,7 +48,7 @@ public class EnronSearchEngine {
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll(), incrementalIDGenerator);
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
 
         List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
         invokeAll(callableList);

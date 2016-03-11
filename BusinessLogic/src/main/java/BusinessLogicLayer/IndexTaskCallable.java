@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 
 public class IndexTaskCallable implements Callable {
 
-    private IncrementalIDGenerator incrementalIDGenerator;
     private final SynchronizedTermsMap syncTermsMap;
     private final Path filePath;
     private final FileLoader fileLoader;
@@ -23,6 +22,7 @@ public class IndexTaskCallable implements Callable {
     private final DocumentsRepository documentsRepository;
     private final TermsRepository termsRepository;
     private final ContainsRepository containsRepository;
+    private IncrementalIDGenerator incrementalIDGenerator;
 
     public IndexTaskCallable(
             Path filePath,
@@ -65,10 +65,26 @@ public class IndexTaskCallable implements Callable {
 
     public List<String> saveTerms(List<Term> terms) {
         for (Term term : terms) {
-                String termId = syncTermsMap.getIdOrGenerateNewId(term.getTerm_Value());
-                term.setTerm_ID(termId);
-                termsRepository.saveTerm(term);
+            boolean saveTerm = false;
+            syncTermsMap.lock.lock();
+            try {
+                String termId = syncTermsMap.getTermIDIfPresent(term.getTerm_Value());
+                if (termId.equals(SynchronizedTermsMap.TERM_NOT_PRESENT)) {
+                    String newTermID = incrementalIDGenerator.termIdGenerator();
+                    syncTermsMap.putTerm(term.getTerm_Value(), newTermID);
+                    term.setTerm_ID(newTermID);
+                    saveTerm = true;
+                } else {
+                    term.setTerm_ID(termId);
+                }
+            } finally {
+                syncTermsMap.lock.unlock();
+                if(saveTerm){
+                    termsRepository.saveTerm(term);
+                }
+            }
         }
+
         return terms.stream()
                 .map(Term::getTerm_ID)
                 .collect(Collectors.toList());
