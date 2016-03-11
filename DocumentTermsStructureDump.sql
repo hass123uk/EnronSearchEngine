@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS `contain_tbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `contain_tbl` (
-  `terms_id` varchar(36) NOT NULL,
-  `documents_id` varchar(36) NOT NULL,
+  `terms_id` INTEGER NOT NULL,
+  `documents_id` INTEGER NOT NULL,
   `position_index` mediumtext NOT NULL,
   KEY `terms_id` (`terms_id`),
   KEY `documents_id` (`documents_id`),
@@ -41,7 +41,7 @@ DROP TABLE IF EXISTS `documents_tbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `documents_tbl` (
-  `documents_id` varchar(36) NOT NULL,
+  `documents_id` INTEGER NOT NULL,
   `documents_url` varchar(500) CHARACTER SET utf8 NOT NULL,
   `documents_indexTime` datetime DEFAULT NULL,
   PRIMARY KEY (`documents_id`)
@@ -56,7 +56,7 @@ DROP TABLE IF EXISTS `terms_tbl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `terms_tbl` (
-  `terms_id` varchar(36) NOT NULL
+  `terms_id` INTEGER NOT NULL
   `terms_value` varchar(500) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`terms_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

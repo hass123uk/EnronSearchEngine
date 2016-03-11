@@ -4,21 +4,21 @@ import java.util.Date;
 
 public class Document {
 
-    private String document_ID;
+    private int document_ID;
     private String document_Path;
     private Date document_IndexTime;
 
-    public Document(String ID, String path, Date indexTime) {
+    public Document(int ID, String path, Date indexTime) {
         this.document_ID = ID;
         this.document_Path = path;
         this.document_IndexTime = indexTime;
     }
 
-    public String getDocument_ID() {
+    public int getDocument_ID() {
         return document_ID;
     }
 
-    public void setDocument_ID(String document_ID) {
+    public void setDocument_ID(int document_ID) {
         this.document_ID = document_ID;
     }
 

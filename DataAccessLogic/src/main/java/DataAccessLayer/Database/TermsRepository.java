@@ -9,12 +9,12 @@ import java.util.List;
 public class TermsRepository {
 
     public void saveTerm(Term term) {
-        String sqlInsert = "INSERT IGNORE INTO terms_tbl(terms_id, terms_value) VALUES(?,?)";
+        String sqlInsert = "INSERT INTO terms_tbl(terms_id, terms_value) VALUES(?,?)";
 
         try (Connection connection = Database.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)
         ) {
-            preparedStatement.setString(1, term.getTerm_ID());
+            preparedStatement.setInt(1, term.getTerm_ID());
             preparedStatement.setString(2, term.getTerm_Value());
             preparedStatement.executeUpdate();
 
@@ -32,7 +32,7 @@ public class TermsRepository {
         ) {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                String terms_id = resultSet.getString("terms_id");
+                int terms_id = resultSet.getInt("terms_id");
                 String terms_value = resultSet.getString("terms_value");
                 allTerms.add(new Term(terms_id, terms_value));
             }

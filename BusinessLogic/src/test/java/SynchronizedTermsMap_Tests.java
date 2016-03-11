@@ -23,7 +23,7 @@ public class SynchronizedTermsMap_Tests {
     public void setup() {
         startingTerms = new ArrayList<>();
         for (int i = 0; i < STARTING_NUM_OF_TERMS; i++) {
-            startingTerms.add(new Term("" + i, "test" + i));
+            startingTerms.add(new Term(i, "test" + i));
         }
         synchronizedTermsMap = new SynchronizedTermsMap(startingTerms);
     }

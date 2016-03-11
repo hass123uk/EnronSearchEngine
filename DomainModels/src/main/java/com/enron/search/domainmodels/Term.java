@@ -2,23 +2,23 @@ package com.enron.search.domainmodels;
 
 public class Term {
 
-    private String term_ID;
+    private int term_ID;
     private String term_Value;
 
     public Term(String Value) {
         this.term_Value = Value;
     }
 
-    public Term(String ID, String Value) {
+    public Term(int ID, String Value) {
         this.term_ID = ID;
         this.term_Value = Value;
     }
 
-    public String getTerm_ID() {
+    public int getTerm_ID() {
         return term_ID;
     }
 
-    public void setTerm_ID(String term_ID) {
+    public void setTerm_ID(int term_ID) {
         this.term_ID = term_ID;
     }
 

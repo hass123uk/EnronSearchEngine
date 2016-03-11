@@ -34,7 +34,7 @@ public class ContainsRepository {
         }
     }
 
-    public void bulkSaveIndexInContainTbl(List<String> termIds, String documentId) {
+    public void bulkSaveIndexInContainTbl(List<Integer> termIds, int documentId) {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id, position_index)"
                 + "VALUES(?, ?, ?)";
 
@@ -45,9 +45,9 @@ public class ContainsRepository {
             int positionId = 1;
 
             int i = 0;
-            for (String termId : termIds) {
-                preparedStatement.setString(1, termId);
-                preparedStatement.setString(2, documentId);
+            for (int termId : termIds) {
+                preparedStatement.setInt(1, termId);
+                preparedStatement.setInt(2, documentId);
                 preparedStatement.setInt(3, positionId);
                 preparedStatement.addBatch();
                 positionId++;

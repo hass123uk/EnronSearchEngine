@@ -13,13 +13,13 @@ public class IncrementalIDGenerator {
 //        UUID randomUUID = UUID.randomUUID();
 //        String randomUUIDString = randomUUID.toString().replaceAll("-", "");
 
-    public String termIdGenerator() {
+    public int termIdGenerator() {
         int idGeneratorAndIncrement = termAtomicInt.getAndIncrement();
-        return String.valueOf(idGeneratorAndIncrement);
+        return idGeneratorAndIncrement;
     }
 
-    public String documentPKGenerator() {
+    public int documentPKGenerator() {
         int idGeneratorAndIncrement = documentAtomicInt.getAndIncrement();
-        return String.valueOf(idGeneratorAndIncrement);
+        return idGeneratorAndIncrement;
     }
 }

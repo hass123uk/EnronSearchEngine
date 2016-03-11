@@ -52,7 +52,7 @@ public class IndexFileCallable_Tests {
         createMocks();
         termList = new ArrayList<>();
         for (int i = 0; i < NUM_OF_TERMS; i++) {
-            termList.add(new Term("id" + i, "term" + i));
+            termList.add(new Term(i, "term" + i));
         }
     }
 
@@ -65,7 +65,7 @@ public class IndexFileCallable_Tests {
                 mockDocumentsRepo, mockTermsRepo, mockContainsRepo);
 
 
-        List<String> termsIDs = indexTaskCallable.saveTerms(termList);
+        List<Integer> termsIDs = indexTaskCallable.saveTerms(termList);
         assertNotNull(termsIDs);
     }
 }

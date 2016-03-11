@@ -19,28 +19,28 @@ public class IncrementalIDGenerator_Tests {
 
     @Test
     public void termPKGenerator_GenerateOneID_AssertNotNull() {
-        String generatedId = incrementalIDGenerator.termIdGenerator();
+        int generatedId = incrementalIDGenerator.termIdGenerator();
         assertNotNull(generatedId);
     }
 
     @Test
     public void termPKGenerator_GenerateTwoIDs_AssertDifferent() {
-        String generatedId1 = incrementalIDGenerator.termIdGenerator();
-        String generatedId2 = incrementalIDGenerator.termIdGenerator();
+        int generatedId1 = incrementalIDGenerator.termIdGenerator();
+        int generatedId2 = incrementalIDGenerator.termIdGenerator();
 
         assertNotEquals(generatedId1, generatedId2);
     }
 
     @Test
     public void documentPKGenerator_GenerateOneID_AssertNotNull() {
-        String generatedId = incrementalIDGenerator.documentPKGenerator();
+        int generatedId = incrementalIDGenerator.documentPKGenerator();
         assertNotNull(generatedId);
     }
 
     @Test
     public void documentPKGenerator_GenerateTwoIDs_AssertDifferent() {
-        String generatedId1 = incrementalIDGenerator.documentPKGenerator();
-        String generatedId2 = incrementalIDGenerator.documentPKGenerator();
+        int generatedId1 = incrementalIDGenerator.documentPKGenerator();
+        int generatedId2 = incrementalIDGenerator.documentPKGenerator();
 
         assertNotEquals(generatedId1, generatedId2);
     }

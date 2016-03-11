@@ -47,30 +47,30 @@ public class IndexTaskCallable implements Callable {
     public Object call() throws Exception {
         List<String> lines = fileLoader.loadLines(filePath);
         Date indexTime = new Date();
-        String documentId = incrementalIDGenerator.documentPKGenerator();
+        int documentId = incrementalIDGenerator.documentPKGenerator();
         saveDocument(documentId, filePath.toAbsolutePath().toString(), indexTime);
 
         List<Term> terms = termSplitter.splitLines(lines);
-        List<String> termIDs = saveTerms(terms);
+        List<Integer> termIDs = saveTerms(terms);
 
         saveRelation(documentId, termIDs);
 
         return null;
     }
 
-    private void saveDocument(String documentId, String absoluteFilePath, Date indexTime) {
+    private void saveDocument(int documentId, String absoluteFilePath, Date indexTime) {
         Document document = new Document(documentId, absoluteFilePath, indexTime);
         documentsRepository.saveDocument(document);
     }
 
-    public List<String> saveTerms(List<Term> terms) {
+    public List<Integer> saveTerms(List<Term> terms) {
         for (Term term : terms) {
             boolean saveTerm = false;
             syncTermsMap.lock.lock();
             try {
-                String termId = syncTermsMap.getTermIDIfPresent(term.getTerm_Value());
-                if (termId.equals(SynchronizedTermsMap.TERM_NOT_PRESENT)) {
-                    String newTermID = incrementalIDGenerator.termIdGenerator();
+                int termId = syncTermsMap.getTermIDIfPresent(term.getTerm_Value());
+                if (termId == SynchronizedTermsMap.TERM_NOT_PRESENT) {
+                    int newTermID = incrementalIDGenerator.termIdGenerator();
                     syncTermsMap.putTerm(term.getTerm_Value(), newTermID);
                     term.setTerm_ID(newTermID);
                     saveTerm = true;
@@ -90,7 +90,7 @@ public class IndexTaskCallable implements Callable {
                 .collect(Collectors.toList());
     }
 
-    private void saveRelation(String documentId, List<String> termIDs) {
+    private void saveRelation(int documentId, List<Integer> termIDs) {
         containsRepository.bulkSaveIndexInContainTbl(termIDs, documentId);
     }
 }

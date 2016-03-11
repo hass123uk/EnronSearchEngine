@@ -7,13 +7,13 @@ import java.sql.*;
 public class DocumentsRepository {
 
     public void saveDocument(Document document){
-        String sqlInsert = "INSERT IGNORE INTO documents_tbl(documents_id, documents_url, "
+        String sqlInsert = "INSERT INTO documents_tbl(documents_id, documents_url, "
                 + "documents_indexTime) VALUES(?, ?, ?)";
 
         try (Connection connection = Database.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)
         ) {
-            preparedStatement.setString(1, document.getDocument_ID());
+            preparedStatement.setInt(1, document.getDocument_ID());
             preparedStatement.setString(2, document.getDocument_Path());
             preparedStatement.setDate(3, new java.sql.Date(
                     document.getDocument_IndexTime().getTime()));

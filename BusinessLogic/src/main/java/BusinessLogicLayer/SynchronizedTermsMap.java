@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
  * Created by HassanMahmud on 05/03/2016.
  */
 public class SynchronizedTermsMap {
-    public static final String TERM_NOT_PRESENT = "TermNotPresent";
+    public static final int TERM_NOT_PRESENT = -1;
     public Lock lock = new ReentrantLock();
-    private Map<String, String> syncTermsMap;
+    private Map<String, Integer> syncTermsMap;
 
     public SynchronizedTermsMap(List<Term> terms) {
-        Map<String, String> termsMap = terms.stream().collect(
+        Map<String, Integer> termsMap = terms.stream().collect(
                 Collectors.toMap(Term::getTerm_Value, Term::getTerm_ID));
         syncTermsMap = Collections.synchronizedMap(termsMap);
     }
@@ -27,7 +27,7 @@ public class SynchronizedTermsMap {
         return syncTermsMap.size();
     }
 
-    public synchronized String getTermIDIfPresent(String term_value) {
+    public synchronized int getTermIDIfPresent(String term_value) {
         boolean containsTermValue = syncTermsMap.containsKey(term_value);
         if (containsTermValue) {
             return syncTermsMap.get(term_value);
@@ -36,7 +36,7 @@ public class SynchronizedTermsMap {
         }
     }
 
-    public synchronized void putTerm(String term_value, String term_id){
+    public synchronized void putTerm(String term_value, int term_id){
         syncTermsMap.put(term_value, term_id);
     }
 
