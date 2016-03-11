@@ -9,7 +9,7 @@ import java.util.List;
 public class TermsRepository {
 
     public void saveTerm(Term term) {
-        String sqlInsert = "INSERT INTO terms_tbl(terms_id, terms_value) VALUES(?,?)";
+        String sqlInsert = "INSERT IGNORE INTO terms_tbl(terms_id, terms_value) VALUES(?,?)";
 
         try (Connection connection = Database.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)

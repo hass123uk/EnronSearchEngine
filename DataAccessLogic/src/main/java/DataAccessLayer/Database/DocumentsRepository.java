@@ -7,7 +7,7 @@ import java.sql.*;
 public class DocumentsRepository {
 
     public void saveDocument(Document document){
-        String sqlInsert = "INSERT INTO documents_tbl(documents_id, documents_url, "
+        String sqlInsert = "INSERT IGNORE INTO documents_tbl(documents_id, documents_url, "
                 + "documents_indexTime) VALUES(?, ?, ?)";
 
         try (Connection connection = Database.getConnection();
