@@ -5,8 +5,10 @@ import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -32,19 +34,21 @@ public class EnronSearchEngine {
     private static ContainsRepository containsRepository;
     private static SynchronizedTermsMap synchronizedTermsMap;
 
-    private String[] mPathToMonitor;
-    private String[] mExtension;
+    private static String[] mPathToMonitor;
+    private static String[] mExtension;
 
-    public EnronSearchEngine(PropertiesConfiguration config) {
+    public static void main(String[] args) throws Exception {
+        PropertiesConfiguration config = new PropertiesConfiguration();
+
         try {
+            config.load(new File("config.properties"));
             mPathToMonitor = config.getStringArray("ID_DEFAULT_FOLDER_TO_MONITOR");
             mExtension = config.getStringArray("ID_EXTENSION");
-        } catch (Exception e) {
+
+        } catch (ConfigurationException e) {
             System.out.print("Default config.properties file not found. Please make sure you set the database and indexing settings.");
         }
-    }
 
-    public void run(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
 
@@ -62,13 +66,13 @@ public class EnronSearchEngine {
         shutdownAndAwaitTermination(pool);
     }
 
-    private void createRepositories() {
+    private static void createRepositories() {
         termsRepository = new TermsRepository();
         documentsRepository = new DocumentsRepository();
         containsRepository = new ContainsRepository();
     }
 
-    private List<Callable<String>> loadFilesFromFSAndMapToCallables() {
+    private static List<Callable<String>> loadFilesFromFSAndMapToCallables() {
         return fileLoader
                 .loadFiles(Paths.get(mPathToMonitor[0].replaceFirst("^~", System.getProperty("user.home"))))
                 .stream()
@@ -76,13 +80,13 @@ public class EnronSearchEngine {
                 .collect(Collectors.toList());
     }
 
-    private IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
+    private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath,
                 synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
         );
     }
 
-    private List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
+    private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
         try {
             return pool.invokeAll(indexFileCallableList)
                     .stream()
@@ -100,7 +104,7 @@ public class EnronSearchEngine {
         }
     }
 
-    private void shutdownAndAwaitTermination(ExecutorService pool) {
+    private static void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
         try {
             // Wait a while for existing tasks to terminate

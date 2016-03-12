@@ -6,4 +6,4 @@
 
 *.iml
 /.idea
-/nbproject/config.properties
+config.properties

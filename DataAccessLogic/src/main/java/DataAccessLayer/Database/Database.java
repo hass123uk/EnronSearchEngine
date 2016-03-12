@@ -37,9 +37,11 @@ public final class Database {
             }
             dataSource.setUrl(dbTypePrefix+config.getString("DB_URL"));
             dataSource.setUsername(config.getString("DB_USER"));
-            dataSource.setPassword(config.getString("DB_PASS"));
+            dataSource.setPassword(config.getString("DB_PASSWORD"));
         } catch (ConfigurationException e) {
-            e.printStackTrace();
+            System.out.print("Please set the database settings first.");
+            System.exit(0);
+
         }
     }
 
