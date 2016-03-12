@@ -5,11 +5,15 @@ import DataAccessLayer.Database.DocumentsRepository;
 import DataAccessLayer.Database.TermsRepository;
 import DataAccessLayer.FileSystem.FileLoader;
 import DataAccessLayer.FileSystem.FileLoaderImpl;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -17,19 +21,7 @@ import java.util.stream.Collectors;
  */
 public class EnronSearchEngine {
 
-    private static final String HOME_DIR = "~";
-    private static final String FILE_NAME = "/EnronDataSet";
-
-    private static final String ALL_DOCS = "/MailDir_FullSet";
-    private static final String HALF_ALL_DOCS = "/MailDir_HalfSet";
-    private static final String FEW_DOCS = "/MailDir_SubSet";
-
     private static final int DEFAULT_MAX_THREADS = 10;
-
-    private static final String ENRON_DATASET_DIR
-            = HOME_DIR
-            + FILE_NAME
-            + HALF_ALL_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -40,7 +32,19 @@ public class EnronSearchEngine {
     private static ContainsRepository containsRepository;
     private static SynchronizedTermsMap synchronizedTermsMap;
 
-    public static void main(String[] args) throws Exception {
+    private String[] mPathToMonitor;
+    private String[] mExtension;
+
+    public EnronSearchEngine(PropertiesConfiguration config) {
+        try {
+            mPathToMonitor = config.getStringArray("ID_DEFAULT_FOLDER_TO_MONITOR");
+            mExtension = config.getStringArray("ID_EXTENSION");
+        } catch (Exception e) {
+            System.out.print("Default config.properties file not found. Please make sure you set the database and indexing settings.");
+        }
+    }
+
+    public void run(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
 
@@ -58,27 +62,27 @@ public class EnronSearchEngine {
         shutdownAndAwaitTermination(pool);
     }
 
-    private static void createRepositories() {
+    private void createRepositories() {
         termsRepository = new TermsRepository();
         documentsRepository = new DocumentsRepository();
         containsRepository = new ContainsRepository();
     }
 
-    private static List<Callable<String>> loadFilesFromFSAndMapToCallables() {
+    private List<Callable<String>> loadFilesFromFSAndMapToCallables() {
         return fileLoader
-                .loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~", System.getProperty("user.home"))))
+                .loadFiles(Paths.get(mPathToMonitor[0].replaceFirst("^~", System.getProperty("user.home"))))
                 .stream()
                 .map(file -> (Callable<String>) newIndexFileTaskCallable(file.toPath()))
                 .collect(Collectors.toList());
     }
 
-    private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
+    private IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath,
                 synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
         );
     }
 
-    private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
+    private List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
         try {
             return pool.invokeAll(indexFileCallableList)
                     .stream()
@@ -96,7 +100,7 @@ public class EnronSearchEngine {
         }
     }
 
-    private static void shutdownAndAwaitTermination(ExecutorService pool) {
+    private void shutdownAndAwaitTermination(ExecutorService pool) {
         pool.shutdown(); // Disable new tasks from being submitted
         try {
             // Wait a while for existing tasks to terminate
