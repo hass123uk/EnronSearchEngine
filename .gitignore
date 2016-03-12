@@ -1,9 +1,3 @@
-/BusinessLogic/target/
-/DataAccessLogic/target/
-/DomainModels/target/
-/EnronGUI/target/
-/DataAccessLogic/nbproject/
-
+target/
 *.iml
 /.idea
-/nbproject/
