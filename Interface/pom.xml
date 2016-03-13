@@ -2,8 +2,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>dk.easv.SearchEngine</groupId>
-        <artifactId>SearchEngine-Main</artifactId>
+        <groupId>dk.easv.SearchIndexer</groupId>
+        <artifactId>Search-Indexer</artifactId>
         <version>1.0</version>
     </parent>
     <artifactId>Interface</artifactId>
@@ -19,21 +19,9 @@
     
     <dependencies>
         <dependency>
-            <groupId>dk.easv.SearchEngine</groupId>
-            <artifactId>DataAccessLogic</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>dk.easv.SearchEngine</groupId>
-            <artifactId>BusinessLogic</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>dk.easv.SearchEngine</groupId>
-            <artifactId>DomainModels</artifactId>
-            <version>${project.version}</version>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.3.1</version>
         </dependency>
     </dependencies>
 </project>

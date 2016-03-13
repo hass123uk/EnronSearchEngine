@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_businesslogic" default="compile.module.businesslogic">
+  <dirname property="module.businesslogic.basedir" file="${ant.file.module_businesslogic}"/>
+  
+  <property name="module.jdk.home.businesslogic" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.businesslogic" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.businesslogic" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.businesslogic" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="businesslogic.output.dir" value="${module.businesslogic.basedir}/target/classes"/>
+  <property name="businesslogic.testoutput.dir" value="${module.businesslogic.basedir}/target/test-classes"/>
+  
+  <path id="businesslogic.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="businesslogic.module.production.classpath">
+    <path refid="${module.jdk.classpath.businesslogic}"/>
+    <pathelement location="${dataaccesslogic.output.dir}"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <pathelement location="${domainmodels.output.dir}"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.1.1.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+  </path>
+  
+  <path id="businesslogic.runtime.production.module.classpath">
+    <pathelement location="${businesslogic.output.dir}"/>
+    <path refid="dataaccesslogic.runtime.production.module.classpath"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="domainmodels.runtime.production.module.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.1.1.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  <path id="businesslogic.module.classpath">
+    <path refid="${module.jdk.classpath.businesslogic}"/>
+    <pathelement location="${businesslogic.output.dir}"/>
+    <pathelement location="${dataaccesslogic.testoutput.dir}"/>
+    <pathelement location="${dataaccesslogic.output.dir}"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <pathelement location="${domainmodels.testoutput.dir}"/>
+    <pathelement location="${domainmodels.output.dir}"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.1.1.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.12.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  <path id="businesslogic.runtime.module.classpath">
+    <pathelement location="${businesslogic.testoutput.dir}"/>
+    <pathelement location="${businesslogic.output.dir}"/>
+    <path refid="dataaccesslogic.runtime.module.classpath"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="domainmodels.runtime.module.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.1.1.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.12.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.businesslogic">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.businesslogic">
+    <patternset refid="excluded.from.module.businesslogic"/>
+  </patternset>
+  
+  <path id="businesslogic.module.sourcepath">
+    <dirset dir="${module.businesslogic.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  <path id="businesslogic.module.test.sourcepath">
+    <dirset dir="${module.businesslogic.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.businesslogic" depends="compile.module.businesslogic.production,compile.module.businesslogic.tests" description="Compile module BusinessLogic"/>
+  
+  <target name="compile.module.businesslogic.production" depends="register.custom.compilers,compile.module.dataaccesslogic,compile.module.domainmodels" description="Compile module BusinessLogic; production classes">
+    <mkdir dir="${businesslogic.output.dir}"/>
+    <javac2 destdir="${businesslogic.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.businesslogic}/javac">
+      <compilerarg line="${compiler.args.businesslogic}"/>
+      <bootclasspath refid="businesslogic.module.bootclasspath"/>
+      <classpath refid="businesslogic.module.production.classpath"/>
+      <src refid="businesslogic.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.businesslogic"/>
+    </javac2>
+    
+    <copy todir="${businesslogic.output.dir}">
+      <fileset dir="${module.businesslogic.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.businesslogic.tests" depends="register.custom.compilers,compile.module.businesslogic.production" description="compile module BusinessLogic; test classes" unless="skip.tests">
+    <mkdir dir="${businesslogic.testoutput.dir}"/>
+    <javac2 destdir="${businesslogic.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.businesslogic}/javac">
+      <compilerarg line="${compiler.args.businesslogic}"/>
+      <bootclasspath refid="businesslogic.module.bootclasspath"/>
+      <classpath refid="businesslogic.module.classpath"/>
+      <src refid="businesslogic.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.businesslogic"/>
+    </javac2>
+    
+    <copy todir="${businesslogic.testoutput.dir}">
+      <fileset dir="${module.businesslogic.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.businesslogic" description="cleanup module">
+    <delete dir="${businesslogic.output.dir}"/>
+    <delete dir="${businesslogic.testoutput.dir}"/>
+  </target>
+</project>

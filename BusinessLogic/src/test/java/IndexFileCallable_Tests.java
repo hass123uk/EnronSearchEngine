@@ -2,13 +2,13 @@
  * Created by HassanMahmud on 04/03/2016.
  */
 
-import dk.easv.SearchEngine.BusinessLogicLayer.IndexTaskCallable;
-import dk.easv.SearchEngine.BusinessLogicLayer.SynchronizedTermsMap;
-import dk.easv.SearchEngine.BusinessLogicLayer.TermSplitter;
-import dk.easv.SearchEngine.DataAccessLayer.Database.ContainsRepository;
-import dk.easv.SearchEngine.DataAccessLayer.Database.DocumentsRepository;
-import dk.easv.SearchEngine.DataAccessLayer.Database.TermsRepository;
-import dk.easv.SearchEngine.DataAccessLayer.FileSystem.FileLoader;
+import dk.easv.SearchIndexer.BusinessLogicLayer.IndexTaskCallable;
+import dk.easv.SearchIndexer.BusinessLogicLayer.SynchronizedTermsMap;
+import dk.easv.SearchIndexer.BusinessLogicLayer.TermSplitter;
+import dk.easv.SearchIndexer.DataAccessLayer.Database.ContainsRepository;
+import dk.easv.SearchIndexer.DataAccessLayer.Database.DocumentsRepository;
+import dk.easv.SearchIndexer.DataAccessLayer.Database.TermsRepository;
+import dk.easv.SearchIndexer.DataAccessLayer.FileSystem.FileLoader;
 import org.junit.Before;
 import org.junit.Test;
 
