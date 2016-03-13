@@ -1,15 +1,9 @@
-import DataAccessLayer.Database.Database;
-import DataAccessLayer.Database.DocumentsRepository;
-import DataAccessLayer.Database.TermsRepository;
-import com.enron.search.domainmodels.Document;
-import com.enron.search.domainmodels.Term;
+import dk.easv.SearchEngine.DataAccessLayer.Database.Database;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.sql.*;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DatabaseUnitTest {
 

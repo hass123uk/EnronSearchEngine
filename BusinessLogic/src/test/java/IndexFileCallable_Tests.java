@@ -2,13 +2,13 @@
  * Created by HassanMahmud on 04/03/2016.
  */
 
-import BusinessLogicLayer.IndexTaskCallable;
-import BusinessLogicLayer.TermSplitter;
-import BusinessLogicLayer.SynchronizedTermsMap;
-import DataAccessLayer.Database.DocumentsRepository;
-import DataAccessLayer.Database.ContainsRepository;
-import DataAccessLayer.Database.TermsRepository;
-import DataAccessLayer.FileSystem.FileLoader;
+import dk.easv.SearchEngine.BusinessLogicLayer.IndexTaskCallable;
+import dk.easv.SearchEngine.BusinessLogicLayer.SynchronizedTermsMap;
+import dk.easv.SearchEngine.BusinessLogicLayer.TermSplitter;
+import dk.easv.SearchEngine.DataAccessLayer.Database.ContainsRepository;
+import dk.easv.SearchEngine.DataAccessLayer.Database.DocumentsRepository;
+import dk.easv.SearchEngine.DataAccessLayer.Database.TermsRepository;
+import dk.easv.SearchEngine.DataAccessLayer.FileSystem.FileLoader;
 import org.junit.Before;
 import org.junit.Test;
 

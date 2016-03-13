@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.enron.search</groupId>
-    <artifactId>Enron-SearchEngine</artifactId>
+    <groupId>dk.easv.SearchEngine</groupId>
+    <artifactId>SearchEngine-Main</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     
-    <name>Enron Search Engine</name>
+    <name>Search Engine</name>
     
     <modules>
         <module>DataAccessLogic</module>
-        <module>EnronGUI</module>
+        <module>Interface</module>
         <module>BusinessLogic</module>
         <module>DomainModels</module>
     </modules>
