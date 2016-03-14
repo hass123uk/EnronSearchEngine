@@ -32,7 +32,7 @@ public class EnronSearchEngine {
             + ALL_DOCS;
 
     private static FileLoader fileLoader;
-    private static TermSplitter splitter;
+    private static StringSplitter splitter;
     private static ExecutorService pool;
 
     private static TermsRepository termsRepository;
@@ -44,7 +44,7 @@ public class EnronSearchEngine {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
-        splitter = new TermSplitter("\\W+");
+        splitter = new StringSplitter("\\W+");
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);

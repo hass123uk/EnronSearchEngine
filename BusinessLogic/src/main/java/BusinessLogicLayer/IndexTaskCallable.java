@@ -18,7 +18,7 @@ public class IndexTaskCallable implements Callable {
     private final SynchronizedTermsMap synchronizedTermsMap;
     private final Path filePath;
     private final FileLoader fileLoader;
-    private final TermSplitter termSplitter;
+    private final StringSplitter stringSplitter;
     private final DocumentsRepository documentsRepository;
     private final TermsRepository termsRepository;
     private final ContainsRepository containsRepository;
@@ -28,7 +28,7 @@ public class IndexTaskCallable implements Callable {
             Path filePath,
             IncrementalIDGenerator incrementalIDGenerator, SynchronizedTermsMap synchronizedTermsMap,
             FileLoader fileLoader,
-            TermSplitter termSplitter,
+            StringSplitter stringSplitter,
             DocumentsRepository documentsRepository,
             TermsRepository termsRepository,
             ContainsRepository containsRepository) {
@@ -37,7 +37,7 @@ public class IndexTaskCallable implements Callable {
         this.incrementalIDGenerator = incrementalIDGenerator;
         this.synchronizedTermsMap = synchronizedTermsMap;
         this.fileLoader = fileLoader;
-        this.termSplitter = termSplitter;
+        this.stringSplitter = stringSplitter;
         this.documentsRepository = documentsRepository;
         this.termsRepository = termsRepository;
         this.containsRepository = containsRepository;
@@ -51,7 +51,7 @@ public class IndexTaskCallable implements Callable {
         Document document = new Document(documentId, filePath.toAbsolutePath().toString(), new Date());
         documentsRepository.insertDocument(document);
 
-        List<Integer> termIds = processAndBatchSaveTerms(termSplitter.splitLines(lines));
+        List<Integer> termIds = processAndBatchSaveTerms(stringSplitter.split(lines));
 
         containsRepository.batchInsertContains(documentId, termIds);
 

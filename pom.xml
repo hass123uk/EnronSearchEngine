@@ -10,7 +10,7 @@
     
     <modules>
         <module>DataAccessLogic</module>
-        <module>EnronGUI</module>
+        <module>Interface</module>
         <module>BusinessLogic</module>
     </modules>
     
