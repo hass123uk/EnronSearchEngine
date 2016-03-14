@@ -13,13 +13,11 @@ public class MainApplication {
 
         // add t option
         options.addOption(new Option("help", false, "Prints this message"));
-        options.addOption(new Option("quit", false, "Exits this application"));
         options.addOption(new Option("dbtype", true, "Set database type, eg. mysql"));
         options.addOption(new Option("dburl", true, "Without any prefix, and no username, password"));
         options.addOption(new Option("dbusername", true, "Set the username for the database connection"));
         options.addOption(new Option("dbpassword", true, "Set the password for the database connection"));
-        options.addOption(new Option("option", false, "Print current options"));
-        options.addOption(new Option("run", true, "Run the indexing with the set configuration"));
+        options.addOption(new Option("showsettings", false, "Print current settings"));
 
         // create the parser
         CommandLineParser parser = new DefaultParser();
@@ -33,7 +31,8 @@ public class MainApplication {
 
                 return;
             }
-            if(line.hasOption("quit")) {
+            if(line.hasOption("dbtype")) {
+
                 return;
             }
         } catch( ParseException exp ) {
