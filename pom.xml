@@ -5,12 +5,11 @@
     <artifactId>Enron-SearchEngine</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    
+
     <name>Enron Search Engine</name>
-    
+
     <modules>
         <module>DataAccessLogic</module>
-        <module>Interface</module>
         <module>BusinessLogic</module>
     </modules>
     
