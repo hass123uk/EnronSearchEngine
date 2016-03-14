@@ -43,19 +43,19 @@ public class EnronSearchEngine {
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
+
         fileLoader = new FileLoaderImpl();
         splitter = new StringSplitter("\\W+");
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
         synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.selectAllTerms());
-
-        List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
-        invokeAll(callableList);
+        List<Callable<Void>> callables = loadFilesFromFSAndMapToCallables();
+        invokeAll(callables);
 
         final long endTime = System.currentTimeMillis();
-        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
-                + " seconds for " + callableList.size() + " files.\n");
+        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toMinutes(endTime - startTime)
+                + " minutes for " + callables.size() + " files.\n");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -65,22 +65,22 @@ public class EnronSearchEngine {
         containsRepository = new ContainsRepository();
     }
 
-    private static List<Callable<String>> loadFilesFromFSAndMapToCallables() {
+    private static List<Callable<Void>> loadFilesFromFSAndMapToCallables() {
         return fileLoader
                 .loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~", System.getProperty("user.home"))))
                 .stream()
-                .map(file -> (Callable<String>) newIndexFileTaskCallable(file.toPath()))
+                .map(file -> newIndexFileTaskCallable(file.toPath()))
                 .collect(Collectors.toList());
     }
 
-    private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
+    private static Callable<Void> newIndexFileTaskCallable(Path filePath) {
         return new IndexTaskCallable(filePath, incrementalIDGenerator,
-                synchronizedTermsMap,fileLoader, splitter, documentsRepository, termsRepository, containsRepository);
+                synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository);
     }
 
-    private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {
+    private static List<Void> invokeAll(List<Callable<Void>> indexingTasks) {
         try {
-            return pool.invokeAll(indexFileCallableList)
+            return pool.invokeAll(indexingTasks)
                     .stream()
                     .map(future -> {
                         try {

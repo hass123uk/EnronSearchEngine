@@ -3,9 +3,9 @@ package BusinessLogicLayer;
 import Database.ContainsRepository;
 import Database.DocumentsRepository;
 import Database.TermsRepository;
-import FileSystem.FileLoader;
-import DomainModels.Term;
 import DomainModels.Document;
+import DomainModels.Term;
+import FileSystem.FileLoader;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class IndexTaskCallable implements Callable {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Void call() throws Exception {
         List<String> lines = fileLoader.loadLines(filePath);
 
         int documentId = incrementalIDGenerator.getNextDocumentID();
