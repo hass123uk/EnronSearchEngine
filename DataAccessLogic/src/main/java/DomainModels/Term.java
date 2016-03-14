@@ -1,4 +1,4 @@
-package com.enron.search.domainmodels;
+package DomainModels;
 
 public class Term {
 

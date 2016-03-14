@@ -1,6 +1,6 @@
 package BusinessLogicLayer;
 
-import com.enron.search.domainmodels.Term;
+import DomainModels.Term;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,25 +13,31 @@ import java.util.stream.Collectors;
  * Created by HassanMahmud on 05/03/2016.
  */
 public class SynchronizedTermsMap {
-    public final static int TERM_NOT_IN_MAP_ERROR = -1;
+
+    public static final int TERM_NOT_PRESENT = -1;
     public Lock lock = new ReentrantLock();
     private Map<String, Integer> syncTermsMap;
 
     public SynchronizedTermsMap(List<Term> terms) {
-        Map<String, Integer> termsMap = terms.stream().collect(Collectors.toMap(Term::getTerm_Value, Term::getTerm_ID));
+        Map<String, Integer> termsMap = terms.stream().collect(
+                Collectors.toMap(Term::getTerm_Value, Term::getTerm_ID));
         syncTermsMap = Collections.synchronizedMap(termsMap);
     }
 
-    public synchronized int getTermID(String term_Value) {
-        boolean containsTermValue = syncTermsMap.containsKey(term_Value);
-        if (containsTermValue) {
-            Integer termId = syncTermsMap.get(term_Value);
-            return termId;
-        } else
-            return TERM_NOT_IN_MAP_ERROR;
+    public synchronized int getMapSize() {
+        return syncTermsMap.size();
     }
 
-    public synchronized void putTerm(Term term) {
-        syncTermsMap.put(term.getTerm_Value(), term.getTerm_ID());
+    public synchronized int getTermIDIfPresent(String term_value) {
+        boolean containsTermValue = syncTermsMap.containsKey(term_value);
+        if (containsTermValue) {
+            return syncTermsMap.get(term_value);
+        } else {
+            return TERM_NOT_PRESENT;
+        }
+    }
+
+    public synchronized void putTerm(String term_value, int term_id) {
+        syncTermsMap.put(term_value, term_id);
     }
 }

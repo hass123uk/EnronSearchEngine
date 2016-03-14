@@ -1,10 +1,10 @@
 package BusinessLogicLayer;
 
-import DataAccessLayer.Database.ContainsRepository;
-import DataAccessLayer.Database.DocumentsRepository;
-import DataAccessLayer.Database.TermsRepository;
-import DataAccessLayer.FileSystem.FileLoader;
-import DataAccessLayer.FileSystem.FileLoaderImpl;
+import Database.ContainsRepository;
+import Database.DocumentsRepository;
+import Database.TermsRepository;
+import FileSystem.FileLoader;
+import FileSystem.FileLoaderImpl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +29,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + HALF_ALL_DOCS;
+            + ALL_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -39,22 +39,23 @@ public class EnronSearchEngine {
     private static DocumentsRepository documentsRepository;
     private static ContainsRepository containsRepository;
     private static SynchronizedTermsMap synchronizedTermsMap;
+    private static IncrementalIDGenerator incrementalIDGenerator;
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
-
-        splitter = new TermSplitterImpl("\\W+");
+        splitter = new TermSplitter("\\W+");
+        incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
-
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
-        List<Callable<String>> callables = loadFilesFromFSAndMapToCallables();
-        invokeAll(callables);
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.selectAllTerms());
+
+        List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
+        invokeAll(callableList);
 
         final long endTime = System.currentTimeMillis();
         System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
-                + " seconds for " + callables.size() + " files.\n");
+                + " seconds for " + callableList.size() + " files.\n");
         shutdownAndAwaitTermination(pool);
     }
 
@@ -73,9 +74,8 @@ public class EnronSearchEngine {
     }
 
     private static IndexTaskCallable newIndexFileTaskCallable(Path filePath) {
-        return new IndexTaskCallable(filePath,
-                synchronizedTermsMap, fileLoader, splitter, documentsRepository, termsRepository, containsRepository
-        );
+        return new IndexTaskCallable(filePath, incrementalIDGenerator,
+                synchronizedTermsMap,fileLoader, splitter, documentsRepository, termsRepository, containsRepository);
     }
 
     private static List<String> invokeAll(List<Callable<String>> indexFileCallableList) {

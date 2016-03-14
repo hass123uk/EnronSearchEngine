@@ -12,7 +12,6 @@
         <module>DataAccessLogic</module>
         <module>EnronGUI</module>
         <module>BusinessLogic</module>
-        <module>DomainModels</module>
     </modules>
     
     <dependencies>
