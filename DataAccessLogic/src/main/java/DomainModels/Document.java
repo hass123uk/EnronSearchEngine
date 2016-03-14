@@ -1,4 +1,4 @@
-package com.enron.search.domainmodels;
+package DomainModels;
 
 import java.util.Date;
 

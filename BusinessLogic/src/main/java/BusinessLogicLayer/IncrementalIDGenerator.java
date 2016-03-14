@@ -10,16 +10,13 @@ public class IncrementalIDGenerator {
     private AtomicInteger termAtomicInt = new AtomicInteger(0);
     private AtomicInteger documentAtomicInt = new AtomicInteger(0);
 
-//        UUID randomUUID = UUID.randomUUID();
-//        String randomUUIDString = randomUUID.toString().replaceAll("-", "");
-
-    public int termIdGenerator() {
-        int idGeneratorAndIncrement = termAtomicInt.getAndIncrement();
-        return idGeneratorAndIncrement;
+    public int getNextTermID() {
+        int increment = termAtomicInt.getAndIncrement();
+        return increment;
     }
 
-    public int documentPKGenerator() {
-        int idGeneratorAndIncrement = documentAtomicInt.getAndIncrement();
-        return idGeneratorAndIncrement;
+    public int getNextDocumentID() {
+        int increment = documentAtomicInt.getAndIncrement();
+        return increment;
     }
 }

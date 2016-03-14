@@ -1,6 +1,6 @@
 package BusinessLogicLayer;
 
-import com.enron.search.domainmodels.Term;
+import DomainModels.Term;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
  * Created by HassanMahmud on 05/03/2016.
  */
 public class SynchronizedTermsMap {
+
     public static final int TERM_NOT_PRESENT = -1;
     public Lock lock = new ReentrantLock();
     private Map<String, Integer> syncTermsMap;
@@ -23,7 +24,7 @@ public class SynchronizedTermsMap {
         syncTermsMap = Collections.synchronizedMap(termsMap);
     }
 
-    public synchronized int getMapSize(){
+    public synchronized int getMapSize() {
         return syncTermsMap.size();
     }
 
@@ -36,19 +37,7 @@ public class SynchronizedTermsMap {
         }
     }
 
-    public synchronized void putTerm(String term_value, int term_id){
+    public synchronized void putTerm(String term_value, int term_id) {
         syncTermsMap.put(term_value, term_id);
     }
-
-
-//    public synchronized String getIdOrGenerateNewId(String term_value) {
-//        boolean containsTermValue = syncTermsMap.containsKey(term_value);
-//        if (containsTermValue) {
-//            return syncTermsMap.get(term_value);
-//        } else {
-//            String newId = incrementalIDGenerator.termIdGenerator();
-//            syncTermsMap.put(term_value, newId);
-//            return newId;
-//        }
-//    }
 }

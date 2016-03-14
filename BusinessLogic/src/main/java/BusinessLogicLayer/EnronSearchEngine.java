@@ -1,10 +1,10 @@
 package BusinessLogicLayer;
 
-import DataAccessLayer.Database.ContainsRepository;
-import DataAccessLayer.Database.DocumentsRepository;
-import DataAccessLayer.Database.TermsRepository;
-import DataAccessLayer.FileSystem.FileLoader;
-import DataAccessLayer.FileSystem.FileLoaderImpl;
+import Database.ContainsRepository;
+import Database.DocumentsRepository;
+import Database.TermsRepository;
+import FileSystem.FileLoader;
+import FileSystem.FileLoaderImpl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +29,7 @@ public class EnronSearchEngine {
     private static final String ENRON_DATASET_DIR
             = HOME_DIR
             + FILE_NAME
-            + FEW_DOCS;
+            + ALL_DOCS;
 
     private static FileLoader fileLoader;
     private static TermSplitter splitter;
@@ -44,11 +44,11 @@ public class EnronSearchEngine {
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
         fileLoader = new FileLoaderImpl();
-        splitter = new TermSplitterImpl("\\W+");
+        splitter = new TermSplitter("\\W+");
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.readAll());
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.selectAllTerms());
 
         List<Callable<String>> callableList = loadFilesFromFSAndMapToCallables();
         invokeAll(callableList);
