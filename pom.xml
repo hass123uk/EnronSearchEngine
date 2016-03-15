@@ -5,22 +5,15 @@
     <artifactId>Enron-SearchEngine</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    
+
     <name>Enron Search Engine</name>
-    
+
     <modules>
         <module>DataAccessLogic</module>
-        <module>EnronGUI</module>
         <module>BusinessLogic</module>
-        <module>DomainModels</module>
     </modules>
     
     <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
