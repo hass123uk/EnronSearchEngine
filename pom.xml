@@ -5,22 +5,13 @@
     <artifactId>Search-Indexer</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-    
-    <name>Search Indexer</name>
-    
     <modules>
         <module>DataAccessLogic</module>
-        <module>Interface</module>
         <module>BusinessLogic</module>
-        <module>DomainModels</module>
+        <module>Interface</module>
     </modules>
     
     <dependencies>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -1,4 +1,4 @@
-package dk.easv.SearchIndexer.DomainModels;
+package DomainModels;
 
 public class Term {
 

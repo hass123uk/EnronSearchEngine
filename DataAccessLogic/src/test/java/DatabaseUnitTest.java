@@ -1,4 +1,4 @@
-import dk.easv.SearchIndexer.DataAccessLayer.Database.Database;
+import Database.Database;
 import org.junit.Assert;
 import org.junit.Test;
 
