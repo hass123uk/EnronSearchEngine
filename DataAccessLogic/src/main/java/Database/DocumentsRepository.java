@@ -1,7 +1,10 @@
 package Database;
+
 import DomainModels.Document;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class DocumentsRepository {
     public void insertDocument(Document document){

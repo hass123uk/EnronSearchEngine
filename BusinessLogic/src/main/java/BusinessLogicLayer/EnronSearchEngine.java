@@ -3,6 +3,7 @@ package BusinessLogicLayer;
 
 import Database.ContainsRepository;
 import Database.DocumentsRepository;
+import Database.ForeignKeyConstraints;
 import Database.TermsRepository;
 import FileSystem.FileLoader;
 import FileSystem.FileLoaderImpl;
@@ -24,7 +25,7 @@ import static Database.Database.initDatabase;
  */
 public class EnronSearchEngine {
 
-    private static final String HOME_DIR = "~";
+    private static final String HOME_DIR = "~".replaceFirst("^~", System.getProperty("user.home"));
     private static final String FILE_NAME = "/EnronDataSet";
 
     private static final String ALL_DOCS = "/MailDir_FullSet";
@@ -47,6 +48,7 @@ public class EnronSearchEngine {
     private static ContainsRepository containsRepository;
     private static SynchronizedTermsMap synchronizedTermsMap;
     private static IncrementalIDGenerator incrementalIDGenerator;
+    private static ForeignKeyConstraints foreignKeyConstraints;
 
     public static void main(String[] args) throws Exception {
         long startTime = System.currentTimeMillis();
@@ -58,15 +60,22 @@ public class EnronSearchEngine {
             initDatabase();
         }
         incrementalIDGenerator = new IncrementalIDGenerator();
-        createRepositories();
-        pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
-        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.selectAllTerms());
-        List<Callable<Void>> callables = loadFilesFromFSAndMapToCallables();
-        invokeAll(callables);
 
+        foreignKeyConstraints = new ForeignKeyConstraints();
+        createRepositories();
+        synchronizedTermsMap = new SynchronizedTermsMap(termsRepository.selectAllTerms());
+
+        pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
+
+        List<Callable<Void>> callableList = loadFilesFromFSAndMapToCallables();
+
+        foreignKeyConstraints.dropTermIDFKConstraint();
+        invokeAll(callableList);
+        foreignKeyConstraints.createTermIDFKConstraint();
         final long endTime = System.currentTimeMillis();
-        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toMinutes(endTime - startTime)
-                + " minutes for " + callables.size() + " files.\n");
+        System.out.print("Total execution time: " + TimeUnit.MILLISECONDS.toSeconds(endTime - startTime)
+                + " seconds for " + callableList.size() + " files.\n");
+
         shutdownAndAwaitTermination(pool);
     }
 
@@ -78,7 +87,7 @@ public class EnronSearchEngine {
 
     private static List<Callable<Void>> loadFilesFromFSAndMapToCallables() {
         return fileLoader
-                .loadFiles(Paths.get(ENRON_DATASET_DIR.replaceFirst("^~", System.getProperty("user.home"))))
+                .loadFiles(Paths.get(ENRON_DATASET_DIR))
                 .stream()
                 .map(file -> newIndexFileTaskCallable(file.toPath()))
                 .collect(Collectors.toList());
@@ -90,6 +99,7 @@ public class EnronSearchEngine {
     }
 
     private static List<Void> invokeAll(List<Callable<Void>> indexingTasks) {
+
         try {
             return pool.invokeAll(indexingTasks)
                     .stream()
