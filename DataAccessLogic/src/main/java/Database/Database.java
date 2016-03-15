@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public final class Database {
 
-    private static final String PATH_TO_SQL_SCRIPT = System.getProperty("user.dir") + "/DocumentTermsStructureDump.sql";
+    private static final String PATH_TO_SQL_SCRIPT = System.getProperty("user.dir") + "/DocumentTermsDump.sql";
 
     private static final BasicDataSource dataSource = new BasicDataSource();
 

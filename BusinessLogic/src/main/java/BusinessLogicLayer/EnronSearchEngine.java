@@ -27,7 +27,7 @@ public class EnronSearchEngine {
     private static final String HOME_DIR = "~";
     private static final String FILE_NAME = "/EnronDataSet";
 
-    private static final String ALL_DOCS = "/MailDir_FullSet";
+    private static final String ALL_DOCS = "/1000";
     private static final String HALF_ALL_DOCS = "/MailDir_HalfSet";
     private static final String FEW_DOCS = "/MailDir_SubSet";
 
@@ -53,10 +53,10 @@ public class EnronSearchEngine {
 
         fileLoader = new FileLoaderImpl();
         splitter = new StringSplitter("\\W+");
+
         if (!checkForTables()) {
             initDatabase();
         }
-
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories();
         pool = Executors.newWorkStealingPool(DEFAULT_MAX_THREADS);
