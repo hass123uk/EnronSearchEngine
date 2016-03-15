@@ -23,11 +23,5 @@
             <artifactId>DataAccessLogic</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>com.enron.search</groupId>
-            <artifactId>DomainModels</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

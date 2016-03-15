@@ -1,103 +1,95 @@
 package BusinessLogicLayer;
 
-import DataAccessLayer.Database.ContainsRepository;
-import DataAccessLayer.Database.DocumentsRepository;
-import DataAccessLayer.Database.TermsRepository;
-import DataAccessLayer.FileSystem.FileLoader;
-import com.enron.search.domainmodels.Document;
-import com.enron.search.domainmodels.Term;
+import Database.ContainsRepository;
+import Database.DocumentsRepository;
+import Database.TermsRepository;
+import DomainModels.Document;
+import DomainModels.Term;
+import FileSystem.FileLoader;
 
 import java.nio.file.Path;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 public class IndexTaskCallable implements Callable {
 
-    private static final int ERROR_CODE = -1;
-
-    private final SynchronizedTermsMap syncTermsMap;
+    private final SynchronizedTermsMap synchronizedTermsMap;
     private final Path filePath;
     private final FileLoader fileLoader;
-    private final TermSplitter termSplitter;
+    private final StringSplitter stringSplitter;
     private final DocumentsRepository documentsRepository;
     private final TermsRepository termsRepository;
     private final ContainsRepository containsRepository;
+    private IncrementalIDGenerator incrementalIDGenerator;
 
     public IndexTaskCallable(
             Path filePath,
-            SynchronizedTermsMap synchronizedTermsMap,
+            IncrementalIDGenerator incrementalIDGenerator, SynchronizedTermsMap synchronizedTermsMap,
             FileLoader fileLoader,
-            TermSplitter termSplitter,
+            StringSplitter stringSplitter,
             DocumentsRepository documentsRepository,
             TermsRepository termsRepository,
             ContainsRepository containsRepository) {
 
         this.filePath = filePath;
-        this.syncTermsMap = synchronizedTermsMap;
+        this.incrementalIDGenerator = incrementalIDGenerator;
+        this.synchronizedTermsMap = synchronizedTermsMap;
         this.fileLoader = fileLoader;
-        this.termSplitter = termSplitter;
+        this.stringSplitter = stringSplitter;
         this.documentsRepository = documentsRepository;
         this.termsRepository = termsRepository;
         this.containsRepository = containsRepository;
     }
 
     @Override
-    public Object call() throws Exception {
-        long startTime = System.nanoTime();
+    public Void call() throws Exception {
         List<String> lines = fileLoader.loadLines(filePath);
-        Date indexTime = new Date();
-        List<Term> terms = termSplitter.splitLines(lines);
 
-        int documentId = saveDocument(filePath.toAbsolutePath().toString(), indexTime);
-        if (documentId != ERROR_CODE) {
-            List<Integer> termIDs = saveTerms(terms);
-            saveRelation(documentId, termIDs);
-            double executionTimeInSeconds = (System.nanoTime() - startTime) / 1E9;
-            return String.format("Success - Document inserted in the database! FilePath: %s.\n" +
-                            "TermIds Size: %d - Terms Size: %d.\n" +
-                            "Indexing time:%s Seconds  (Loading & Splitting lines/Saving Documents,Terms and Relations)\n"
-                    , filePath.toString(), termIDs.size(), terms.size(), executionTimeInSeconds);
-        }
-        return String.format("Error - Document was not inserted in the database! File Path: %s.\n", filePath.toString());
+        int documentId = incrementalIDGenerator.getNextDocumentID();
+        Document document = new Document(documentId, filePath.toAbsolutePath().toString(), new Date());
+        documentsRepository.insertDocument(document);
+
+        List<Integer> termIds = processAndBatchSaveTerms(stringSplitter.split(lines));
+
+        containsRepository.batchInsertContains(documentId, termIds);
+
+        return null;
     }
 
-    private int saveDocument(String absoluteFilePath, Date indexTime) {
-        Document document = new Document(absoluteFilePath, indexTime);
-        try {
-            return documentsRepository.saveDocument(document);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ERROR_CODE;
-        }
-    }
+    private List<Integer> processAndBatchSaveTerms(List<String> termValues) {
+        List<Integer> termIds = new ArrayList<>();
+        List<Term> newTerms = new ArrayList<>();
 
-    public List<Integer> saveTerms(List<Term> terms) {
-        for (Term term : terms) {
-            syncTermsMap.lock.lock();
-            try {
-                int mapTermId = syncTermsMap.getTermID(term.getTerm_Value());
-                if (mapTermId != syncTermsMap.TERM_NOT_IN_MAP_ERROR) {
-                    term.setTerm_ID(mapTermId);
-                } else try {
-                    int termId = termsRepository.saveTerm(term.getTerm_Value());
-                    if (termId != ERROR_CODE) {
-                        term.setTerm_ID(termId);
-                        syncTermsMap.putTerm(term);
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } finally {
-                syncTermsMap.lock.unlock();
+        int newTermID = incrementalIDGenerator.getNextTermID();
+        for (String termValue : termValues) {
+            int termID = getOrSetTermID(termValue, newTermID);
+            termIds.add(termID);
+
+            if (termID == newTermID) {
+                newTerms.add(new Term(termID, termValue));
+                newTermID = incrementalIDGenerator.getNextTermID();
             }
         }
-        return terms.stream().map(Term::getTerm_ID).collect(Collectors.toList());
+        termsRepository.batchInsertTerm(newTerms);
+        return termIds;
     }
 
-    private void saveRelation(int documentId, List<Integer> termIDs) {
-        containsRepository.bulkSaveIndexInContainTbl(termIDs, documentId);
+    private int getOrSetTermID(String termValue, int newID) {
+        int termID;
+        synchronizedTermsMap.lock.lock();
+        try {
+            int idFromMap = synchronizedTermsMap.getTermIDIfPresent(termValue);
+            if (idFromMap != SynchronizedTermsMap.TERM_NOT_PRESENT) {
+                termID = idFromMap;
+            } else {
+                synchronizedTermsMap.putTerm(termValue, newID);
+                termID = newID;
+            }
+        } finally {
+            synchronizedTermsMap.lock.unlock();
+        }
+        return termID;
     }
 }

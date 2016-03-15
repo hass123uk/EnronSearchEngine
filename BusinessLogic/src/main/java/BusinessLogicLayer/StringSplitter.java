@@ -1,24 +1,21 @@
 package BusinessLogicLayer;
 
-import com.enron.search.domainmodels.Term;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TermSplitterImpl implements TermSplitter {
+public class StringSplitter {
 
     private final String regexToSplitOn;
 
-    public TermSplitterImpl(String regexToSplitOn) {
+    public StringSplitter(String regexToSplitOn) {
         this.regexToSplitOn = regexToSplitOn;
     }
 
-    @Override
-    public List<Term> splitLines(List<String> lines) {
+    public List<String> split(List<String> lines) {
         return lines.stream()
                 .flatMap(line -> Stream.of(line.split(regexToSplitOn)))
                 .map(String::toLowerCase)
-                .map(Term::new)
                 .collect(Collectors.toList());
     }
 }
