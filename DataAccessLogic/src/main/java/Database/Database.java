@@ -15,7 +15,7 @@ public final class Database {
 
     static {
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost/temDocs?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
+        dataSource.setUrl("jdbc:mysql://localhost/temDocs2?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
         dataSource.setUsername("sqluser");
         dataSource.setPassword("sqluserpw");
     }
@@ -28,13 +28,13 @@ public final class Database {
 
     public static boolean checkForTables() {
         String sqlCheck = "SHOW TABLES";
-        try (Connection connection = Database.getConnection()) {
-            PreparedStatement ps = connection.prepareStatement(sqlCheck);
-            ResultSet res = ps.executeQuery();
-            res.last();
-            if (res.getRow() != 3) {
-                return false;
-            }
+        try (Connection connection = Database.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlCheck);
+             ResultSet res = preparedStatement.executeQuery()) {
+                res.last();
+                if (res.getRow() != 3) {
+                    return false;
+                }
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -43,12 +43,10 @@ public final class Database {
     }
 
     public static boolean initDatabase() {
-        Statement st = null;
-        try (Connection connection = Database.getConnection())
-        {
+        try (Connection connection = Database.getConnection();
+             Statement statement = connection.createStatement()) {
             Scanner s = new Scanner(FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT));
             s.useDelimiter("(;(\r)?\n)|(--\n)");
-            st = connection.createStatement();
             while (s.hasNext())
             {
                 String line = s.next();
@@ -60,10 +58,9 @@ public final class Database {
 
                 if (line.trim().length() > 0)
                 {
-                    st.execute(line);
+                    statement.execute(line);
                 }
             }
-            st.close();
         } catch (SQLException | FileNotFoundException ex) {
             ex.printStackTrace();
             return false;
