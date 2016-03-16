@@ -23,6 +23,5 @@
             <artifactId>DataAccessLogic</artifactId>
             <version>${project.version}</version>
         </dependency>
-
     </dependencies>
 </project>

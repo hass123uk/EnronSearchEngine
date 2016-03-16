@@ -1,16 +1,26 @@
 package Database;
 
+
+import org.apache.commons.configuration2.Configuration;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
 public class ContainsRepository {
+
+    private final Configuration mConfig;
+
+    public ContainsRepository(Configuration config) {
+        this.mConfig = config;
+    }
+
     public void batchInsertContains(int documentId, List<Integer> termIds) {
         String sqlInsert = "INSERT INTO contain_tbl(terms_id, documents_id, position_index)"
                 + "VALUES(?, ?, ?)";
 
-        try (Connection connection = Database.getConnection();
+        try (Connection connection = Database.getConnection(mConfig);
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
             connection.setAutoCommit(false);
 
