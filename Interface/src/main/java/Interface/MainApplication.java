@@ -1,4 +1,4 @@
-package dk.easv.SearchIndexer.Interface;
+package Interface;
 
 import org.apache.commons.cli.*;
 
