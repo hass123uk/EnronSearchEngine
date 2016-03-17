@@ -1,6 +1,7 @@
 package Database;
 
 import DataAccessLayer.FileSystem.FileUtil;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.io.FileNotFoundException;
@@ -13,22 +14,24 @@ public final class Database {
 
     private static final BasicDataSource dataSource = new BasicDataSource();
 
-    static {
-        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://localhost/temDocs2?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
-        dataSource.setUsername("sqluser");
-        dataSource.setPassword("sqluserpw");
-    }
+    public static Connection getConnection(Configuration config) throws SQLException {
+        String dbtype=config.getString("DB_TYPE");
+        switch (dbtype) {
+            case "mysql":
+                dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        }
+        dataSource.setUrl("jdbc:"+dbtype+"://"+config.getString("DB_HOSTNAME")+"/"+config.getString("DB_NAME")+"?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
+        dataSource.setUsername(config.getString("DB_USER"));
+        dataSource.setPassword(config.getString("DB_PASS"));
 
-    public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 
     private Database() {}
 
-    public static boolean checkForTables() {
+    public static boolean checkForTables(Configuration config) {
         String sqlCheck = "SHOW TABLES";
-        try (Connection connection = Database.getConnection();
+        try (Connection connection = Database.getConnection(config);
              PreparedStatement preparedStatement = connection.prepareStatement(sqlCheck);
              ResultSet res = preparedStatement.executeQuery()) {
                 res.last();
@@ -42,8 +45,8 @@ public final class Database {
         return true;
     }
 
-    public static boolean initDatabase() {
-        try (Connection connection = Database.getConnection();
+    public static boolean initDatabase(Configuration config) {
+        try (Connection connection = Database.getConnection(config);
              Statement statement = connection.createStatement()) {
             Scanner s = new Scanner(FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT));
             s.useDelimiter("(;(\r)?\n)|(--\n)");
