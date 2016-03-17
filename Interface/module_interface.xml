@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_interface" default="compile.module.interface">
+  <dirname property="module.interface.basedir" file="${ant.file.module_interface}"/>
+  
+  <property name="module.jdk.home.interface" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.interface" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.interface" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.interface" value="-encoding UTF-8 -source 8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="interface.output.dir" value="${module.interface.basedir}/target/classes"/>
+  <property name="interface.testoutput.dir" value="${module.interface.basedir}/target/test-classes"/>
+  
+  <path id="interface.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="interface.module.production.classpath">
+    <path refid="${module.jdk.classpath.interface}"/>
+    <path refid="library.maven:_commons-cli:commons-cli:1.3.1.classpath"/>
+    <pathelement location="${dataaccesslogic.output.dir}"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <pathelement location="${businesslogic.output.dir}"/>
+    <pathelement location="${domainmodels.output.dir}"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+  </path>
+  
+  <path id="interface.runtime.production.module.classpath">
+    <pathelement location="${interface.output.dir}"/>
+    <path refid="library.maven:_commons-cli:commons-cli:1.3.1.classpath"/>
+    <path refid="dataaccesslogic.runtime.production.module.classpath"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="businesslogic.runtime.production.module.classpath"/>
+    <path refid="domainmodels.runtime.production.module.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  <path id="interface.module.classpath">
+    <path refid="${module.jdk.classpath.interface}"/>
+    <pathelement location="${interface.output.dir}"/>
+    <path refid="library.maven:_commons-cli:commons-cli:1.3.1.classpath"/>
+    <pathelement location="${dataaccesslogic.testoutput.dir}"/>
+    <pathelement location="${dataaccesslogic.output.dir}"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <pathelement location="${businesslogic.testoutput.dir}"/>
+    <pathelement location="${businesslogic.output.dir}"/>
+    <pathelement location="${domainmodels.testoutput.dir}"/>
+    <pathelement location="${domainmodels.output.dir}"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.12.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  <path id="interface.runtime.module.classpath">
+    <pathelement location="${interface.testoutput.dir}"/>
+    <pathelement location="${interface.output.dir}"/>
+    <path refid="library.maven:_commons-cli:commons-cli:1.3.1.classpath"/>
+    <path refid="dataaccesslogic.runtime.module.classpath"/>
+    <path refid="library.maven:_mysql:mysql-connector-java:5.1.38.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-dbcp2:2.1.1.classpath"/>
+    <path refid="library.maven:_org.apache.commons:commons-pool2:2.4.2.classpath"/>
+    <path refid="library.maven:_commons-logging:commons-logging:1.2.classpath"/>
+    <path refid="library.maven:_com.google.inject:guice:3.0.classpath"/>
+    <path refid="library.maven:_javax.inject:javax.inject:1.classpath"/>
+    <path refid="library.maven:_aopalliance:aopalliance:1.0.classpath"/>
+    <path refid="library.maven:_commons-configuration:commons-configuration:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.1.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.4.classpath"/>
+    <path refid="library.maven:_commons-digester:commons-digester:1.8.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath"/>
+    <path refid="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath"/>
+    <path refid="businesslogic.runtime.module.classpath"/>
+    <path refid="domainmodels.runtime.module.classpath"/>
+    <path refid="library.maven:_com.google.guava:guava:19.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.12.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+    <path refid="library.maven:_org.mockito:mockito-core:1.10.19.classpath"/>
+    <path refid="library.maven:_org.objenesis:objenesis:2.1.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.interface">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.interface">
+    <patternset refid="excluded.from.module.interface"/>
+  </patternset>
+  
+  <path id="interface.module.sourcepath">
+    <dirset dir="${module.interface.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.interface" depends="compile.module.interface.production,compile.module.interface.tests" description="Compile module Interface"/>
+  
+  <target name="compile.module.interface.production" depends="register.custom.compilers,compile.module.dataaccesslogic,compile.module.businesslogic,compile.module.domainmodels" description="Compile module Interface; production classes">
+    <mkdir dir="${interface.output.dir}"/>
+    <javac2 destdir="${interface.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.interface}/javac">
+      <compilerarg line="${compiler.args.interface}"/>
+      <bootclasspath refid="interface.module.bootclasspath"/>
+      <classpath refid="interface.module.production.classpath"/>
+      <src refid="interface.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.interface"/>
+    </javac2>
+    
+    <copy todir="${interface.output.dir}">
+      <fileset dir="${module.interface.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.interface.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.interface.tests" depends="register.custom.compilers,compile.module.interface.production" description="compile module Interface; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.interface" description="cleanup module">
+    <delete dir="${interface.output.dir}"/>
+    <delete dir="${interface.testoutput.dir}"/>
+  </target>
+</project>

@@ -1,5 +1,10 @@
 target/
 *.iml
 /.idea
+<<<<<<< HEAD
+config.properties
+out/
+=======
 nbproject/
 config.properties
+>>>>>>> 547b43c31bf49db2bf09a177d12c27b7ad1dcb6a

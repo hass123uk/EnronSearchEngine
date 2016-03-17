@@ -1,5 +1,7 @@
 package Database;
 import DomainModels.Term;
+import org.apache.commons.configuration2.Configuration;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,10 +11,16 @@ import java.util.List;
 
 public class TermsRepository {
 
+    private Configuration mConfig;
+
+    public TermsRepository(Configuration config) {
+        this.mConfig = config;
+    }
+
     public void batchInsertTerm(List<Term> terms) {
         String sqlInsert = "INSERT INTO terms_tbl(terms_id, terms_value) VALUES(?, ?)";
 
-        try (Connection connection = Database.getConnection();
+        try (Connection connection = Database.getConnection(mConfig);
              PreparedStatement preparedStatement = connection.prepareStatement(sqlInsert)) {
             connection.setAutoCommit(false);
 
@@ -39,7 +47,7 @@ public class TermsRepository {
         List<Term> allTerms = new ArrayList<>();
         String sqlSelect = "Select * FROM terms_tbl";
 
-        try (Connection connection = Database.getConnection();
+        try (Connection connection = Database.getConnection(mConfig);
              PreparedStatement preparedStatement = connection.prepareStatement(sqlSelect);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
