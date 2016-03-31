@@ -1,6 +1,5 @@
 package BusinessLogicLayer;
 
-
 import Database.ContainsRepository;
 import Database.DocumentsRepository;
 import Database.TermsRepository;
@@ -18,13 +17,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static Database.Database.checkForTables;
-import static Database.Database.initDatabase;
+import static Database.Database.runSqlScript;
 
 /**
  *
  */
 public class EnronSearchEngine {
 
+    private static String PATH_TO_CREATE_SQL = System.getProperty("user.dir") + "/../DocumentTermsDump.sql";
 
     private static final int DEFAULT_MAX_THREADS = 10;
 
@@ -45,7 +45,7 @@ public class EnronSearchEngine {
         splitter = new StringSplitter("\\W+");
 
         if (!checkForTables(config)) {
-            initDatabase(config);
+            runSqlScript(config, PATH_TO_CREATE_SQL);
         }
         incrementalIDGenerator = new IncrementalIDGenerator();
         createRepositories(config);

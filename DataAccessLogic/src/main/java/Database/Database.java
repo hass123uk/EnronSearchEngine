@@ -10,8 +10,6 @@ import java.sql.*;
 
 public class Database {
 
-    private static final String PATH_TO_SQL_SCRIPT = System.getProperty("user.dir") + "/DocumentTermsDump.sql";
-
     private static final BasicDataSource dataSource = new BasicDataSource();
 
     public static Connection getConnection(Configuration config) throws SQLException {
@@ -45,16 +43,10 @@ public class Database {
         return true;
     }
 
-    public static boolean initDatabase(Configuration config) {
-        try {
-            Connection connection = Database.getConnection(config);
-            InputStream sql = FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT);
-            SQLHelper.executeSql(connection,sql);
-        } catch (SQLException | FileNotFoundException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-        return true;
+    public static void runSqlScript(Configuration config, String sqlScriptPath) throws SQLException, FileNotFoundException {
+        Connection connection = Database.getConnection(config);
+        InputStream sql = FileUtil.getInputStreamFrom(sqlScriptPath);
+        SQLHelper.executeSql(connection,sql);
     }
 
 }
