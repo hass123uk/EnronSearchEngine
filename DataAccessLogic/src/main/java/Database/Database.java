@@ -5,8 +5,8 @@ import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.*;
-import java.util.Scanner;
 
 public final class Database {
 
@@ -46,28 +46,16 @@ public final class Database {
     }
 
     public static boolean initDatabase(Configuration config) {
-        try (Connection connection = Database.getConnection(config);
-             Statement statement = connection.createStatement()) {
-            Scanner s = new Scanner(FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT));
-            s.useDelimiter("(;(\r)?\n)|(--\n)");
-            while (s.hasNext())
-            {
-                String line = s.next();
-                if (line.startsWith("/*!") && line.endsWith("*/"))
-                {
-                    int i = line.indexOf(' ');
-                    line = line.substring(i + 1, line.length() - " */".length());
-                }
-
-                if (line.trim().length() > 0)
-                {
-                    statement.execute(line);
-                }
-            }
+        try {
+            Connection connection = Database.getConnection(config);
+            InputStream sql = FileUtil.getInputStreamFrom(PATH_TO_SQL_SCRIPT);
+            SQLHelper.executeSql(connection,sql);
         } catch (SQLException | FileNotFoundException ex) {
             ex.printStackTrace();
             return false;
         }
         return true;
     }
+
 }
+
