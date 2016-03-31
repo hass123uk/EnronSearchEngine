@@ -8,7 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.*;
 
-public final class Database {
+public class Database {
 
     private static final String PATH_TO_SQL_SCRIPT = System.getProperty("user.dir") + "/DocumentTermsDump.sql";
 

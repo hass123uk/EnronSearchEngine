@@ -6,6 +6,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -15,6 +16,8 @@ import static Database.Database.checkForTables;
 import static Database.SQLHelper.executeSql;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by anthonymonori on 17/03/16.
@@ -56,16 +59,10 @@ public class DatabaseTestCase {
      * Simple test to see if database connection if working
      */
     @Test
-    public void testDbConnection() {
-        boolean thrown = false;
+    public void testDbConnection() throws SQLException {
+        Database database = mock(Database.class);
 
-        try {
-            Database.getConnection(mConfig);
-        } catch (SQLException e) {
-            thrown = true;
-        }
-
-        assertFalse("There has been an exception thrown", thrown);
+        verify(database).getConnection(mConfig);
     }
 
 
