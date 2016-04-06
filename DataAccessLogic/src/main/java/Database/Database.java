@@ -1,12 +1,15 @@
 package Database;
 
-import DataAccessLayer.FileSystem.FileUtil;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.dbcp2.BasicDataSource;
 
+
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Database {
 
@@ -17,10 +20,10 @@ public class Database {
         switch (dbtype) {
             case "mysql":
                 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+                dataSource.setUrl("jdbc:"+dbtype+"://"+config.getString("DB_HOSTNAME")+"/"+config.getString("DB_NAME")+"?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
+                dataSource.setUsername(config.getString("DB_USER"));
+                dataSource.setPassword(config.getString("DB_PASS"));
         }
-        dataSource.setUrl("jdbc:"+dbtype+"://"+config.getString("DB_HOSTNAME")+"/"+config.getString("DB_NAME")+"?autoReconnect=true&useSSL=false&rewriteBatchedStatements=true");
-        dataSource.setUsername(config.getString("DB_USER"));
-        dataSource.setPassword(config.getString("DB_PASS"));
 
         return dataSource.getConnection();
     }
@@ -45,8 +48,8 @@ public class Database {
 
     public static void runSqlScript(Configuration config, String sqlScriptPath) throws SQLException, FileNotFoundException {
         Connection connection = Database.getConnection(config);
-        InputStream sql = FileUtil.getInputStreamFrom(sqlScriptPath);
-        SQLHelper.executeSql(connection,sql);
+        File file = new File(sqlScriptPath);
+        SQLHelper.executeSqlFile(connection,file);
     }
 
 }

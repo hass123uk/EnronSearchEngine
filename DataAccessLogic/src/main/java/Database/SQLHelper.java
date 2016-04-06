@@ -1,8 +1,7 @@
 package Database;
 
-import DataAccessLayer.FileSystem.FileUtil;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -12,18 +11,9 @@ import java.util.Scanner;
 
 public class SQLHelper {
 
-    public static void executeSql(Connection connection, Scanner s) throws SQLException {
-        execute(connection,s);
-    }
-
-    public static void executeSql(Connection connection, String pathToSql) throws FileNotFoundException, SQLException {
-        Scanner s = new Scanner(FileUtil.getInputStreamFrom(pathToSql));
-        execute(connection,s);
-
-    }
-
-    public static void executeSql(Connection connection, InputStream sql) throws SQLException {
-        Scanner s = new Scanner(sql);
+    public static void executeSqlFile(Connection connection, File sql) throws SQLException, FileNotFoundException {
+        InputStream is = new FileInputStream(sql);
+        Scanner s = new Scanner(is);
         execute(connection,s);
     }
 

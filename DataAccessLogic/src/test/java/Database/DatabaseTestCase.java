@@ -1,6 +1,6 @@
-import Database.Database;
+package Database;
+
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,16 +31,7 @@ public class DatabaseTestCase {
      */
     @Before
     public void setUp() {
-        mConfig = new PropertiesConfiguration();
-
-        mConfig.addProperty("DB_TYPE", "mysql");
-        mConfig.addProperty("DB_HOSTNAME", "localhost");
-        mConfig.addProperty("DB_NAME", "IndexingTestDb");
-        mConfig.addProperty("DB_USER", "sqluser");
-        mConfig.addProperty("DB_PASS", "sqluserpw");
-
-        mConfig.addProperty("ID_DEFAULT_FOLDER_TO_MONITOR", "TestData");
-        mConfig.addProperty("ID_EXTENSION", ".txt");
+        mConfig = SharedTestConfiguration.getInstance().getConfiguration();
 
         if (!checkForTables(mConfig)) {
             try {
@@ -58,11 +49,11 @@ public class DatabaseTestCase {
      */
     @Test
     public void databaseTestCase_verifyConnection_assertNotNull() throws SQLException {
-        Connection connection = verify(mDatabase).getConnection(mConfig);
+        // Arrange, Act
+        Connection connection = mDatabase.getConnection(mConfig);
 
+        // Assert
         assertNotNull(connection);
-
-        connection.close();
     }
 
     /**
@@ -70,9 +61,13 @@ public class DatabaseTestCase {
      */
     @Test
     public void databaseTestCase_checkForTables_assertBoolean() throws SQLException {
-        boolean tablesExist = false;                ;
+        // Arrange
+        boolean tablesExist = false;
+
+        // Act
         tablesExist = mDatabase.checkForTables(mConfig);
 
+        // Assert
         assertTrue(tablesExist);
     }
 
